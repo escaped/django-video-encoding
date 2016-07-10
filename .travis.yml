@@ -1,0 +1,20 @@
+language: python
+
+python:
+  - 2.7
+  - 3.5
+  - 3.6
+
+install:
+  - sudo apt-get install -y ffmpeg
+  - pip install -U tox
+  - pip install python-coveralls
+
+script:
+  - tox -r
+
+after_success:
+  - coveralls
+
+notifications:
+  email: false
