@@ -68,8 +68,8 @@ class FFmpegBackend(BaseEncodingBackend):
     def _check_returncode(self, process):
         stdout, stderr = process.communicate()
         if process.returncode != 0:
-            raise FFmpegError("`{}` exited with code {:d}".format(
-                ' '.join(process.args), process.returncode))
+            raise FFmpegError("`ffmpeg` exited with code {:d}".format(
+                process.returncode))
         self.stdout = stdout.decode(console_encoding)
         self.stderr = stderr.decode(console_encoding)
         return self.stdout, self.stderr
