@@ -69,8 +69,8 @@ class FFmpegBackend(BaseEncodingBackend):
         stdout, stderr = process.communicate()
         if process.returncode != 0:
             logger.warning(stderr.decode(console_encoding))
-            raise FFmpegError("`ffmpeg` exited with code {:d}".format(
-                process.returncode))
+            raise FFmpegError("`ffmpeg` exited with code {:d}\n{}".format(
+                process.returncode, stderr.decode(console_encoding)))
         self.stdout = stdout.decode(console_encoding)
         self.stderr = stderr.decode(console_encoding)
         return self.stdout, self.stderr
