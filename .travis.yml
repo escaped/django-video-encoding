@@ -1,12 +1,14 @@
+dist: trusty
+sudo: required
+
 language: python
 
-python:
-  - 2.7
-  - 3.5
-  - 3.6
+before_install:
+  - sudo add-apt-repository ppa:mc3man/trusty-media -y
+  - sudo apt-get update -q
+  - sudo apt-get install ffmpeg -y
 
 install:
-  - sudo apt-get install -y ffmpeg
   - pip install -U tox
   - pip install python-coveralls
 
