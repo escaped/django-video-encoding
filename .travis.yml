@@ -13,7 +13,7 @@ before_install:
   - sudo apt-get install ffmpeg -y
 
 install:
-  - pip install -U tox
+  - pip install -U tox-travis
   - pip install python-coveralls
 
 script:
