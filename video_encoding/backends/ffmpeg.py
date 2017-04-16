@@ -68,9 +68,8 @@ class FFmpegBackend(BaseEncodingBackend):
     def _check_returncode(self, process):
         stdout, stderr = process.communicate()
         if process.returncode != 0:
-            logger.warning(stderr.decode(console_encoding))
-            raise FFmpegError("`ffmpeg` exited with code {:d}\n{}".format(
-                process.returncode, stderr.decode(console_encoding)))
+            raise FFmpegError("`{}` exited with code {:d}".format(
+                ' '.join(process.args), process.returncode))
         self.stdout = stdout.decode(console_encoding)
         self.stderr = stderr.decode(console_encoding)
         return self.stdout, self.stderr
@@ -148,7 +147,7 @@ class FFmpegBackend(BaseEncodingBackend):
         Returns information about the given video as dict.
         """
         cmds = [self.ffprobe_path, '-i', video_path]
-        cmds.extend(['-v', 'quiet', '-print_format', 'json'])
+        cmds.extend(['-print_format', 'json'])
         cmds.extend(['-show_format', '-show_streams'])
 
         process = self._spawn(cmds)
