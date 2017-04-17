@@ -182,6 +182,7 @@ If you want to open source your backend, follow these steps.
 1. create a packages named django-video-encoding-BACKENDNAME
 2. publish your package to pypi_
 3. Submit a pull requests with the following changes:
+
    * add the package to ``extra_requires``
    * provide reasonable defaults for ``VIDEO_ENCODING_FORMATS``
 
