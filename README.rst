@@ -149,9 +149,26 @@ If you want to customize the formats, you have to specify ``name``,
          ]
 
 
+Encoding Backends
+=================
+
+video_encoding.backends.ffmpeg.FFmpegBackend (default)
+------------------------------------------------------
+Backend for using ``ffmpeg`` and ``ffprobe`` to convert your videos.
+
+Options
+.......
+
+**VIDEO_ENCODING_FFMPEG_PATH**
+Path to ``ffmpeg``. If no path is provided, the backend uses ``which`` to
+locate it.
+**VIDEO_ENCODING_FFPROBE_PATH**
+Path to ``ffprobe``. If no path is provided, the backend uses ``which`` to
+locate it.
+
 
 Custom Backend
-==============
+--------------
 
 You can implement a custom encoding backend. Create a new class which inherits
 from ``video_encoding.backends.base.BaseEncodingBackend``. You must set the
