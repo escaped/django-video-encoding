@@ -10,8 +10,8 @@ django-video-encoding
     :target: http://travis-ci.org/escaped/django-video-encoding
     :alt: Build Status
 
-.. image:: https://coveralls.io/repos/escaped/django-video-encoding/badge.png?branch=master
-    :target: https://coveralls.io/r/escaped/django-video-encoding
+.. image:: https://coveralls.io/repos/github/escaped/django-video-encoding/badge.svg?branch=master
+    :target: https://coveralls.io/github/escaped/django-video-encoding?branch=master
     :alt: Coverage
 
 .. image:: https://img.shields.io/pypi/pyversions/django-video-encoding.svg
