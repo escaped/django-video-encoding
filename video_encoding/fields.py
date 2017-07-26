@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.db.models.fields.files import (FieldFile, ImageField,
                                            ImageFileDescriptor)
 from django.utils.translation import ugettext as _
@@ -18,7 +19,13 @@ class VideoFieldFile(VideoFile, FieldFile):
         super(VideoFieldFile, self).delete(save=save)
 
 
+validate_video_file_extension = FileExtensionValidator(
+    allowed_extensions=['mp4', 'mov', 'flv'],
+)
+
+
 class VideoField(ImageField):
+    default_validators = [validate_video_file_extension]
     attr_class = VideoFieldFile
     descriptor_class = VideoFileDescriptor
     description = _("Video")

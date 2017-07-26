@@ -17,9 +17,7 @@ def upload_format_to(i, f):
 
 
 class Format(models.Model):
-    object_id = models.PositiveIntegerField(
-        editable=False,
-    )
+    object_id = models.TextField(editable=False, db_index=True)
     content_type = models.ForeignKey(
         ContentType,
         editable=False,
