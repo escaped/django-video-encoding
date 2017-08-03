@@ -13,6 +13,7 @@ before_install:
   - sudo apt-get install ffmpeg -y
 
 install:
+  - pip install django
   - pip install -U tox-travis
   - pip install python-coveralls
 
