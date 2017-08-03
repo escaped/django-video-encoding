@@ -1,10 +1,10 @@
-from django.core.validators import FileExtensionValidator
-from django.db.models.fields.files import (FieldFile, ImageField,
+from django.db.models.fields.files import (FieldFile, FileField,
                                            ImageFileDescriptor)
 from django.utils.translation import ugettext as _
 
 from .backends import get_backend_class
 from .files import VideoFile
+from .forms import VideoField as VideoFormField
 
 
 class VideoFileDescriptor(ImageFileDescriptor):
@@ -19,24 +19,20 @@ class VideoFieldFile(VideoFile, FieldFile):
         super(VideoFieldFile, self).delete(save=save)
 
 
-validate_video_file_extension = FileExtensionValidator(
-    allowed_extensions=['mp4', 'mov', 'flv'],
-)
-
-
-class VideoField(ImageField):
-    default_validators = [validate_video_file_extension]
+class VideoField(FileField):
     attr_class = VideoFieldFile
     descriptor_class = VideoFileDescriptor
     description = _("Video")
 
     def __init__(self, verbose_name=None, name=None, duration_field=None,
+                 width_field=None, height_field=None,
                  **kwargs):
         self.duration_field = duration_field
+        self.width_field, self.height_field = width_field, height_field
         super(VideoField, self).__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super(ImageField, self).check(**kwargs)
+        errors = super(VideoField, self).check(**kwargs)
         errors.extend(self._check_backend())
         return errors
 
@@ -46,7 +42,7 @@ class VideoField(ImageField):
 
     def to_python(self, data):
         # use FileField method
-        return super(ImageField, self).to_python(data)
+        return super(VideoField, self).to_python(data)
 
     def update_dimension_fields(self, instance, force=False, *args, **kwargs):
         _file = getattr(instance, self.attname)
@@ -55,9 +51,6 @@ class VideoField(ImageField):
         if not _file._committed:
             return
 
-        # write `width` and `height`
-        super(VideoField, self).update_dimension_fields(instance, force,
-                                                        *args, **kwargs)
         if not self.duration_field:
             return
 
@@ -75,4 +68,6 @@ class VideoField(ImageField):
 
     def formfield(self, **kwargs):
         # use normal FileFieldWidget for now
-        return super(ImageField, self).formfield(**kwargs)
+        defaults = {'form_class': VideoFormField}
+        defaults.update(kwargs)
+        return super().formfield(**kwargs)
