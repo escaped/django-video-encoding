@@ -99,7 +99,7 @@ the ``post-save`` signal and enqueue the saved instance for processing. ::
    def convert_video(sender, instance, **kwargs):
        enqueue(tasks.convert_all_videos,
                instance.meta.app_label,
-               instance.meta.model_name
+               instance.meta.model_name,
                instance.pk)
 
 After a while You can access the converted videos using ::
