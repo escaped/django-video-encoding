@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('width', models.PositiveIntegerField(verbose_name='Width', null=True)),
                 ('height', models.PositiveIntegerField(verbose_name='Height', null=True)),
                 ('duration', models.PositiveIntegerField(verbose_name='Duration (s)', null=True)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Format',

@@ -23,6 +23,7 @@ class Format(models.Model):
     content_type = models.ForeignKey(
         ContentType,
         editable=False,
+        on_delete=models.CASCADE
     )
     video = GenericForeignKey()
     field_name = models.CharField(
