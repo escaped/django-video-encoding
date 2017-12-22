@@ -24,8 +24,11 @@ class FFmpegBackend(BaseEncodingBackend):
     name = 'FFmpeg'
 
     def __init__(self):
+
+        # Add -strict -2 parameters to support aac codec (which is experimental)
+        # This will fix errors in tests
         self.params = ['-threads', str(settings.VIDEO_ENCODING_THREADS),
-                       '-y']  # overwrite temporary created file
+                       '-y', '-strict', '-2']  # overwrite temporary created file
 
         self.ffmpeg_path = getattr(
             settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg'))
