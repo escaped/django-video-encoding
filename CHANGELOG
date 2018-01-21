@@ -1,6 +1,14 @@
 CHANGELOG
 =======
 
-0.1 (unreleased)
+
+0.2 (21.01.2018)
 ----------------
-Initial release
+
+ * Support for django 1.11 and 2.0 (Thanks @goranpavlovic)
+
+
+0.1 (24.04.2017)
+----------------
+
+ * Initial release
