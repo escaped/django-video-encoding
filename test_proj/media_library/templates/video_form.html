@@ -1,0 +1,19 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Video Upload</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit">
+    </form>
+
+    <h2>Uploaded Videos</h2>
+    {% for video in videos %}
+      {{ video.file.name }}
+      (Duration: {{ video.duration }}s, {{ video.width }}x{{ video.height }})
+      <br>
+    {% endfor %}
+  </body>
+</html>
