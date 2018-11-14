@@ -34,7 +34,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "~2.7 || ^3.5"
 
-Django = "^1.8 || ^2.0"
+Django = "^1.11 || ^2.0"
 django-appconf = "^1.0"
 shutilwhich = "^1.1"
 pillow = "^5.0"

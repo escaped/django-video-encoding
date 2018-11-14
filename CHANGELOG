@@ -6,6 +6,7 @@ Unreleased
 
 * Example for Form usage
 * Switched to poetry for dependency management and packaging
+* Dropped Support for Django <1.11
 
 
 0.2 (21.01.2018)
