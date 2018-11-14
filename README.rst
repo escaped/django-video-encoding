@@ -91,15 +91,16 @@ the ``post-save`` signal and enqueue the saved instance for processing. ::
    from django.dispatch import receiver
    from django_rq import enqueue
 
-   from . import tasks
+   from video_encoding import tasks
+
    from .models import Video
 
 
    @receiver(post_save, sender=Video)
    def convert_video(sender, instance, **kwargs):
        enqueue(tasks.convert_all_videos,
-               instance.meta.app_label,
-               instance.meta.model_name,
+               instance._meta.app_label,
+               instance._meta.model_name,
                instance.pk)
 
 After a while You can access the converted videos using ::
@@ -187,3 +188,19 @@ If you want to open source your backend, follow these steps.
    * provide reasonable defaults for ``VIDEO_ENCODING_FORMATS``
 
 .. _pypi: https://pypi.python.org/pypi
+
+
+Development
+===========
+
+This project is using `poetry <https://poetry.eustace.io/>`_ to manage all
+dev dependencies.
+Clone this repository and run ::
+
+   poetry develop
+
+
+to create a virtual enviroment with all dependencies.
+You can now run the test suite using ::
+
+  poetry run pytest

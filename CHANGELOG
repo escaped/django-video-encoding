@@ -5,6 +5,7 @@ Unreleased
 ----------
 
 * Example for Form usage
+* Switched to poetry for dependency management and packaging
 
 
 0.2 (21.01.2018)

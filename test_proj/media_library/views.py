@@ -1,7 +1,5 @@
 from django.views.generic import CreateView
 
-from video_encoding.fields import VideoField
-
 from .models import Video
 
 

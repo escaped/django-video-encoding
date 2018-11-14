@@ -25,10 +25,13 @@ class FFmpegBackend(BaseEncodingBackend):
 
     def __init__(self):
 
-        # Add -strict -2 parameters to support aac codec (which is experimental)
         # This will fix errors in tests
-        self.params = ['-threads', str(settings.VIDEO_ENCODING_THREADS),
-                       '-y', '-strict', '-2']  # overwrite temporary created file
+        self.params = [
+            '-threads',
+            str(settings.VIDEO_ENCODING_THREADS),
+            '-y',  # overwrite temporary created file
+            '-strict', '-2',  # support aac codec (which is experimental)
+        ]
 
         self.ffmpeg_path = getattr(
             settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg'))
@@ -77,7 +80,8 @@ class FFmpegBackend(BaseEncodingBackend):
         self.stderr = stderr.decode(console_encoding)
         return self.stdout, self.stderr
 
-    def encode(self, source_path, target_path, params):
+    # TODO reduce complexity
+    def encode(self, source_path, target_path, params):  # NOQA: C901
         """
         Encodes a video to a specified file. All encoder specific options
         are passed in using `params`.
