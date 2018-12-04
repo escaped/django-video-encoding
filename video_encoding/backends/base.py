@@ -30,5 +30,8 @@ class BaseEncodingBackend(six.with_metaclass(abc.ABCMeta)):
     def get_thumbnail(self, video_path):  # pragma: no cover
         """
         Extracts an image of a video and returns its path.
+
+        If the requested thumbnail is not within the duration of the video
+        an `InvalidTimeError` is thrown.
         """
         pass

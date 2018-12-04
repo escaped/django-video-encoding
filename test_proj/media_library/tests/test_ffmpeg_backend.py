@@ -1,8 +1,10 @@
 import os
 import tempfile
 
+import pytest
 from PIL import Image
 
+from video_encoding import exceptions
 from video_encoding.backends.ffmpeg import FFmpegBackend
 
 
@@ -44,6 +46,27 @@ def test_get_thumbnail(ffmpeg, video_path):
         width, height = im.size
         assert width == 1280
         assert height == 720
+
+
+def test_get_thumbnail__invalid_time(ffmpeg, video_path):
+    with pytest.raises(exceptions.InvalidTimeError):
+        ffmpeg.get_thumbnail(video_path, at_time=1000000)
+
+
+@pytest.mark.parametrize(
+    'offset', (0, 0.02),
+)
+def test_get_thumbnail__too_close_to_the_end(ffmpeg, video_path, offset):
+    """
+    If the selected time point is close to the end of the video,
+    a video frame cannot be extracted.
+    """
+    duration = ffmpeg.get_media_info(video_path)['duration']
+
+    with pytest.raises(exceptions.InvalidTimeError):
+        ffmpeg.get_thumbnail(
+            video_path, at_time=duration - offset,
+        )
 
 
 def test_check():
