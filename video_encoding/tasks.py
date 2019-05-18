@@ -40,8 +40,11 @@ def convert_video(fieldfile, force=False):
     instance = fieldfile.instance
     field = fieldfile.field
 
-    filename = os.path.basename(fieldfile.path)
-    source_path = fieldfile.path
+    try:
+        source_path = fieldfile.path
+    except NotImplementedError:
+        source_path = fieldfile.url
+    filename = os.path.basename(source_path)
 
     encoding_backend = get_backend()
 
