@@ -29,6 +29,8 @@ Installation
 ============
 
 #. Install django-video-encoding ::
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fescaped%2Fdjango-video-encoding.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fescaped%2Fdjango-video-encoding?ref=badge_shield)
+
 
     pip install django-video-encoding
 
@@ -204,3 +206,7 @@ to create a virtual enviroment with all dependencies.
 You can now run the test suite using ::
 
   poetry run pytest
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fescaped%2Fdjango-video-encoding.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fescaped%2Fdjango-video-encoding?ref=badge_large)
