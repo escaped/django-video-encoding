@@ -43,7 +43,8 @@ class VideoFile(File):
         if not hasattr(self, '_info_cache'):
             encoding_backend = get_backend()
 
-            local_path, local_tmp_file = get_fieldfile_local_path(fieldfile=self)
+            local_path, local_tmp_file = \
+                get_fieldfile_local_path(fieldfile=self)
 
             info_cache = encoding_backend.get_media_info(local_path)
 

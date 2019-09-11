@@ -1,12 +1,12 @@
 import os
 import tempfile
 
-
 def get_fieldfile_local_path(fieldfile):
+
+    local_temp_file = None
+
     if hasattr(fieldfile, 'storage'):
         storage = fieldfile.storage
-        local_temp_file = None
-
         try:
             # Try to access with path
             storage_local_path = storage.path(
