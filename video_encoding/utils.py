@@ -1,8 +1,8 @@
 import os
 import tempfile
 
-def get_fieldfile_local_path(fieldfile):
 
+def get_fieldfile_local_path(fieldfile):
     local_temp_file = None
 
     if hasattr(fieldfile, 'storage'):
