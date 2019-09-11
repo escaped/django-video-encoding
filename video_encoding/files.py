@@ -41,9 +41,31 @@ class VideoFile(File):
         """
         if not hasattr(self, '_info_cache'):
             encoding_backend = get_backend()
-            try:
-                path = os.path.abspath(self.path)
-            except AttributeError:
-                path = os.path.abspath(self.name)
-            self._info_cache = encoding_backend.get_media_info(path)
+
+            if hasattr(self, 'file'):
+                # Its an actual file
+                try:
+                    path = os.path.abspath(self.path)
+                except AttributeError:
+                    path = os.path.abspath(self.name)
+
+                info_cache = encoding_backend.get_media_info(path)
+            else:
+                # Its not an actual file, so assume storage abstraction
+                storage_path = getattr(self, 'path', self.name)
+                if not hasattr(self, 'storage'):
+                    raise Exception('VideoFile uses storages yet has no self.storage')
+
+                storage = self.storage
+
+                try:
+                    # If its a storage with file system implementation
+                    storage_local_path = storage.path(storage_path)
+                except NotImplementedError:
+                    storage_local_path = storage.url(storage_path)
+
+                info_cache = encoding_backend.get_media_info(storage_local_path)
+
+            self._info_cache = info_cache
+
         return self._info_cache
