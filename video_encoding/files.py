@@ -54,7 +54,9 @@ class VideoFile(File):
                 # Its not an actual file, so assume storage abstraction
                 storage_path = getattr(self, 'path', self.name)
                 if not hasattr(self, 'storage'):
-                    raise Exception('VideoFile uses storages yet has no self.storage')
+                    raise Exception(
+                        'VideoFile uses storages yet has no self.storage'
+                    )
 
                 storage = self.storage
 
