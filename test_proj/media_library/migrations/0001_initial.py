@@ -8,7 +8,7 @@ import video_encoding.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = []
+    dependencies = []  # type: ignore
 
     operations = [
         migrations.CreateModel(
