@@ -12,9 +12,10 @@ def test_encoding(video):
 
     assert video.format_set.count() == 4
 
-    formats = dict([(o['name'], o)
-                    for o in settings.VIDEO_ENCODING_FORMATS['FFmpeg']])
-    assert set(video.format_set.values_list('format', flat=True)) == set(formats.keys())  # NOQA
+    formats = dict([(o['name'], o) for o in settings.VIDEO_ENCODING_FORMATS['FFmpeg']])
+    assert set(video.format_set.values_list('format', flat=True)) == set(
+        formats.keys()
+    )  # NOQA
 
     for f in video.format_set.all():
         assert formats[f.format]['extension'] == f.file.name.split('.')[-1]

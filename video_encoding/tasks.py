@@ -49,7 +49,9 @@ def convert_video(fieldfile, force=False):
         video_format, created = Format.objects.get_or_create(
             object_id=instance.pk,
             content_type=ContentType.objects.get_for_model(instance),
-            field_name=field.name, format=options['name'])
+            field_name=field.name,
+            format=options['name'],
+        )
 
         # do not reencode if not requested
         if video_format.file and not force:
@@ -61,11 +63,13 @@ def convert_video(fieldfile, force=False):
         # TODO do not upscale videos
 
         _, target_path = tempfile.mkstemp(
-            suffix='_{name}.{extension}'.format(**options))
+            suffix='_{name}.{extension}'.format(**options)
+        )
 
         try:
             encoding = encoding_backend.encode(
-                source_path, target_path, options['params'])
+                source_path, target_path, options['params']
+            )
             while encoding:
                 try:
                     progress = next(encoding)
@@ -80,9 +84,9 @@ def convert_video(fieldfile, force=False):
 
         # save encoded file
         video_format.file.save(
-            '{filename}_{name}.{extension}'.format(filename=filename,
-                                                   **options),
-            File(open(target_path, mode='rb')))
+            '{filename}_{name}.{extension}'.format(filename=filename, **options),
+            File(open(target_path, mode='rb')),
+        )
 
         video_format.update_progress(100)  # now we are ready
 

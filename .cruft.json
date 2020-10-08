@@ -1,0 +1,19 @@
+{
+    "template": "https://github.com/escaped/cookiecutter-pypackage.git",
+    "commit": "b58e99ccf10eede92dee5810738871726199ecbb",
+    "context": {
+        "cookiecutter": {
+            "author": "Alexander Frenzel",
+            "author_email": "alex@relatedworks.com",
+            "github_username": "escaped",
+            "project_name": "django-video-encoding",
+            "project_slug": "video_encoding",
+            "short_description": "django-video-encoding helps to convert your videos into different formats and resolutions.",
+            "version": "0.4.0",
+            "line_length": "88",
+            "uses_django": "y",
+            "_template": "https://github.com/escaped/cookiecutter-pypackage.git"
+        }
+    },
+    "directory": null
+}

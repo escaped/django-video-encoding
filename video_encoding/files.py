@@ -16,6 +16,7 @@ class VideoFile(File):
         Returns video width in pixels.
         """
         return self._get_video_info().get('width', 0)
+
     width = property(_get_width)
 
     def _get_height(self):
@@ -23,6 +24,7 @@ class VideoFile(File):
         Returns video height in pixels.
         """
         return self._get_video_info().get('height', 0)
+
     height = property(_get_height)
 
     def _get_duration(self):
@@ -30,6 +32,7 @@ class VideoFile(File):
         Returns duration in seconds.
         """
         return self._get_video_info().get('duration', 0)
+
     duration = property(_get_duration)
 
     def _get_video_info(self):

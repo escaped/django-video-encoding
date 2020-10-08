@@ -10,5 +10,5 @@ class FormatQuerySet(QuerySet):
         return self.filter(progress=100)
 
 
-class FormatManager(Manager.from_queryset(FormatQuerySet)):
+class FormatManager(Manager.from_queryset(FormatQuerySet)):  # type: ignore
     use_for_related_fields = True

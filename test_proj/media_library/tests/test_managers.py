@@ -9,7 +9,10 @@ def video_format(video):
     return Format.objects.create(
         object_id=video.pk,
         content_type=ContentType.objects.get_for_model(video),
-        field_name='file', format='mp4_hd', progress=100)
+        field_name='file',
+        format='mp4_hd',
+        progress=100,
+    )
 
 
 @pytest.mark.django_db

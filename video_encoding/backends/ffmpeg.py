@@ -30,21 +30,26 @@ class FFmpegBackend(BaseEncodingBackend):
             '-threads',
             str(settings.VIDEO_ENCODING_THREADS),
             '-y',  # overwrite temporary created file
-            '-strict', '-2',  # support aac codec (which is experimental)
+            '-strict',
+            '-2',  # support aac codec (which is experimental)
         ]
 
         self.ffmpeg_path = getattr(
-            settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg'))
+            settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg')
+        )
         self.ffprobe_path = getattr(
-            settings, 'VIDEO_ENCODING_FFPROBE_PATH', which('ffprobe'))
+            settings, 'VIDEO_ENCODING_FFPROBE_PATH', which('ffprobe')
+        )
 
         if not self.ffmpeg_path:
-            raise exceptions.FFmpegError("ffmpeg binary not found: {}".format(
-                self.ffmpeg_path or ''))
+            raise exceptions.FFmpegError(
+                "ffmpeg binary not found: {}".format(self.ffmpeg_path or '')
+            )
 
         if not self.ffprobe_path:
-            raise exceptions.FFmpegError("ffprobe binary not found: {}".format(
-                self.ffmpeg_path or ''))
+            raise exceptions.FFmpegError(
+                "ffprobe binary not found: {}".format(self.ffmpeg_path or '')
+            )
 
     @classmethod
     def check(cls):
@@ -52,30 +57,39 @@ class FFmpegBackend(BaseEncodingBackend):
         try:
             FFmpegBackend()
         except exceptions.FFmpegError as e:
-            errors.append(checks.Error(
-                e.msg,
-                hint="Please install ffmpeg.",
-                obj=cls,
-                id='video_conversion.E001',
-            ))
+            errors.append(
+                checks.Error(
+                    e.msg,
+                    hint="Please install ffmpeg.",
+                    obj=cls,
+                    id='video_conversion.E001',
+                )
+            )
         return errors
 
     def _spawn(self, cmds):
         try:
             return Popen(
-                cmds, shell=False,
-                stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                cmds,
+                shell=False,
+                stdin=PIPE,
+                stdout=PIPE,
+                stderr=PIPE,
                 close_fds=True,
             )
         except OSError as e:
             raise six.raise_from(
-                exceptions.FFmpegError('Error while running ffmpeg binary'), e)
+                exceptions.FFmpegError('Error while running ffmpeg binary'), e
+            )
 
     def _check_returncode(self, process):
         stdout, stderr = process.communicate()
         if process.returncode != 0:
-            raise exceptions.FFmpegError("`{}` exited with code {:d}".format(
-                ' '.join(process.args), process.returncode))
+            raise exceptions.FFmpegError(
+                "`{}` exited with code {:d}".format(
+                    ' '.join(process.args), process.returncode
+                )
+            )
         self.stdout = stdout.decode(console_encoding)
         self.stderr = stderr.decode(console_encoding)
         return self.stdout, self.stderr
@@ -140,12 +154,21 @@ class FFmpegBackend(BaseEncodingBackend):
 
     def _parse_media_info(self, data):
         media_info = json.loads(data)
-        media_info['video'] = [stream for stream in media_info['streams']
-                               if stream['codec_type'] == 'video']
-        media_info['audio'] = [stream for stream in media_info['streams']
-                               if stream['codec_type'] == 'audio']
-        media_info['subtitle'] = [stream for stream in media_info['streams']
-                                  if stream['codec_type'] == 'subtitle']
+        media_info['video'] = [
+            stream
+            for stream in media_info['streams']
+            if stream['codec_type'] == 'video'
+        ]
+        media_info['audio'] = [
+            stream
+            for stream in media_info['streams']
+            if stream['codec_type'] == 'audio'
+        ]
+        media_info['subtitle'] = [
+            stream
+            for stream in media_info['streams']
+            if stream['codec_type'] == 'subtitle'
+        ]
         del media_info['streams']
         return media_info
 

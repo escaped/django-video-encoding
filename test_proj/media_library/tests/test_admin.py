@@ -3,9 +3,9 @@ from django.urls import reverse
 
 
 @pytest.fixture()
-def admin_client(django_app, admin_user):
-    django_app.set_user(admin_user)
-    return django_app
+def admin_client(client, admin_user):
+    client.force_login(admin_user)
+    return client
 
 
 def test_format_inline(admin_client, video):
