@@ -17,16 +17,49 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Format',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        serialize=False,
+                        verbose_name='ID',
+                        primary_key=True,
+                        auto_created=True,
+                    ),
+                ),
                 ('object_id', models.PositiveIntegerField()),
                 ('field_name', models.CharField(max_length=255)),
-                ('progress', models.PositiveSmallIntegerField(verbose_name='Progress', default=0)),
+                (
+                    'progress',
+                    models.PositiveSmallIntegerField(
+                        verbose_name='Progress', default=0
+                    ),
+                ),
                 ('format', models.CharField(verbose_name='Format', max_length=255)),
-                ('file', video_encoding.fields.VideoField(height_field='height', verbose_name='File', width_field='width', max_length=2048, upload_to=video_encoding.models.upload_format_to)),
+                (
+                    'file',
+                    video_encoding.fields.VideoField(
+                        height_field='height',
+                        verbose_name='File',
+                        width_field='width',
+                        max_length=2048,
+                        upload_to=video_encoding.models.upload_format_to,
+                    ),
+                ),
                 ('width', models.PositiveIntegerField(verbose_name='Width', null=True)),
-                ('height', models.PositiveIntegerField(verbose_name='Height', null=True)),
-                ('duration', models.PositiveIntegerField(verbose_name='Duration (s)', null=True)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=models.CASCADE)),
+                (
+                    'height',
+                    models.PositiveIntegerField(verbose_name='Height', null=True),
+                ),
+                (
+                    'duration',
+                    models.PositiveIntegerField(verbose_name='Duration (s)', null=True),
+                ),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        to='contenttypes.ContentType', on_delete=models.CASCADE
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Format',

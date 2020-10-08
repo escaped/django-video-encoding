@@ -13,7 +13,8 @@ def upload_format_to(i, f):
     return 'formats/%s/%s%s' % (
         i.format,
         splitext(getattr(i.video, i.field_name).name)[0],  # keep path
-        splitext(f)[1].lower())
+        splitext(f)[1].lower(),
+    )
 
 
 class Format(models.Model):
@@ -21,9 +22,7 @@ class Format(models.Model):
         editable=False,
     )
     content_type = models.ForeignKey(
-        ContentType,
-        editable=False,
-        on_delete=models.CASCADE
+        ContentType, editable=False, on_delete=models.CASCADE
     )
     video = GenericForeignKey()
     field_name = models.CharField(
@@ -46,7 +45,8 @@ class Format(models.Model):
         max_length=2048,
         upload_to=upload_format_to,
         verbose_name=_("File"),
-        width_field='width', height_field='height',
+        width_field='width',
+        height_field='height',
     )
     width = models.PositiveIntegerField(
         editable=False,

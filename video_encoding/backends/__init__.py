@@ -11,7 +11,9 @@ def get_backend_class():
     except ImportError as e:
         raise ImproperlyConfigured(
             _("Cannot retrieve backend '{}'. Error: '{}'.").format(
-                settings.VIDEO_ENCODING_BACKEND, e))
+                settings.VIDEO_ENCODING_BACKEND, e
+            )
+        )
     return cls
 
 
