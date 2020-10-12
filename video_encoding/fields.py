@@ -1,5 +1,4 @@
-from django.db.models.fields.files import (FieldFile, ImageField,
-                                           ImageFileDescriptor)
+from django.db.models.fields.files import FieldFile, ImageField, ImageFileDescriptor
 from django.utils.translation import ugettext as _
 
 from .backends import get_backend_class
@@ -23,8 +22,7 @@ class VideoField(ImageField):
     descriptor_class = VideoFileDescriptor
     description = _("Video")
 
-    def __init__(self, verbose_name=None, name=None, duration_field=None,
-                 **kwargs):
+    def __init__(self, verbose_name=None, name=None, duration_field=None, **kwargs):
         self.duration_field = duration_field
         super(VideoField, self).__init__(verbose_name, name, **kwargs)
 
@@ -49,8 +47,9 @@ class VideoField(ImageField):
             return
 
         # write `width` and `height`
-        super(VideoField, self).update_dimension_fields(instance, force,
-                                                        *args, **kwargs)
+        super(VideoField, self).update_dimension_fields(
+            instance, force, *args, **kwargs
+        )
         if not self.duration_field:
             return
 
