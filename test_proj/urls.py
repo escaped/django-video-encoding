@@ -1,9 +1,9 @@
-from django.conf.urls import url
+from django.conf.urls import re_path
 from django.contrib import admin
 
 from .media_library.views import VideoFormView
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^', VideoFormView.as_view()),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^$', VideoFormView.as_view()),
 ]

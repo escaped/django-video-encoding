@@ -1,5 +1,5 @@
 from django.db.models.fields.files import FieldFile, ImageField, ImageFileDescriptor
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .backends import get_backend_class
 from .files import VideoFile
