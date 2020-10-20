@@ -6,7 +6,6 @@ import re
 import tempfile
 from subprocess import PIPE, Popen
 
-import six
 from django.core import checks
 
 from .. import exceptions
@@ -78,9 +77,7 @@ class FFmpegBackend(BaseEncodingBackend):
                 close_fds=True,
             )
         except OSError as e:
-            raise six.raise_from(
-                exceptions.FFmpegError('Error while running ffmpeg binary'), e
-            )
+            raise exceptions.FFmpegError('Error while running ffmpeg binary') from e
 
     def _check_returncode(self, process):
         stdout, stderr = process.communicate()
