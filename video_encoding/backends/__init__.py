@@ -2,10 +2,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
-from ..config import settings
-
 
 def get_backend_class():
+    from ..config import settings
+
     try:
         cls = import_string(settings.VIDEO_ENCODING_BACKEND)
     except ImportError as e:
@@ -18,5 +18,7 @@ def get_backend_class():
 
 
 def get_backend():
+    from ..config import settings
+
     cls = get_backend_class()
     return cls(**settings.VIDEO_ENCODING_BACKEND_PARAMS)
