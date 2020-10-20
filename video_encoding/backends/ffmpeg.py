@@ -4,12 +4,12 @@ import logging
 import os
 import re
 import tempfile
+from shutil import which
 from subprocess import PIPE, Popen
 
 from django.core import checks
 
 from .. import exceptions
-from ..compat import which
 from ..config import settings
 from .base import BaseEncodingBackend
 

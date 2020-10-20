@@ -448,14 +448,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "shutilwhich"
-version = "1.1.0"
-description = "shutil.which for those not using Python 3.3 yet."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -567,7 +559,7 @@ testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1, <4.0"
-content-hash = "2e35c227742d1f0255af9f057adb5d239248a3850324f65b6095990740ace64f"
+content-hash = "fc489d5deb389ad48d702573f37fce0d3ea0757dd07ec31986d1ffd8a4827a2e"
 
 [metadata.files]
 appdirs = [
@@ -834,9 +826,6 @@ regex = [
     {file = "regex-2020.10.15-cp39-cp39-win32.whl", hash = "sha256:698f8a5a2815e1663d9895830a063098ae2f8f2655ae4fdc5dfa2b1f52b90087"},
     {file = "regex-2020.10.15-cp39-cp39-win_amd64.whl", hash = "sha256:a51e51eecdac39a50ede4aeed86dbef4776e3b73347d31d6ad0bc9648ba36049"},
     {file = "regex-2020.10.15.tar.gz", hash = "sha256:d25f5cca0f3af6d425c9496953445bf5b288bb5b71afc2b8308ad194b714c159"},
-]
-shutilwhich = [
-    {file = "shutilwhich-1.1.0.tar.gz", hash = "sha256:db1f39c6461e42f630fa617bb8c79090f7711c9ca493e615e43d0610ecb64dc6"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
