@@ -1,9 +1,7 @@
 import abc
 
-import six
 
-
-class BaseEncodingBackend(six.with_metaclass(abc.ABCMeta)):
+class BaseEncodingBackend(metaclass=abc.ABCMeta):
     # used as key to get all defined formats from `VIDEO_ENCODING_FORMATS`
     name = 'undefined'
 
