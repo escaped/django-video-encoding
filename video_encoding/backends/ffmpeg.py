@@ -1,11 +1,12 @@
+import io
 import json
-import locale
 import logging
 import os
 import re
+import subprocess
 import tempfile
 from shutil import which
-from subprocess import PIPE, Popen
+from typing import Dict, Generator, List, Union
 
 from django.core import checks
 
@@ -16,16 +17,12 @@ from .base import BaseEncodingBackend
 logger = logging.getLogger(__name__)
 RE_TIMECODE = re.compile(r'time=(\d+:\d+:\d+.\d+) ')
 
-console_encoding = locale.getdefaultlocale()[1] or 'UTF-8'
-
 
 class FFmpegBackend(BaseEncodingBackend):
     name = 'FFmpeg'
 
-    def __init__(self):
-
-        # This will fix errors in tests
-        self.params = [
+    def __init__(self) -> None:
+        self.params: List[str] = [
             '-threads',
             str(settings.VIDEO_ENCODING_THREADS),
             '-y',  # overwrite temporary created file
@@ -33,10 +30,10 @@ class FFmpegBackend(BaseEncodingBackend):
             '-2',  # support aac codec (which is experimental)
         ]
 
-        self.ffmpeg_path = getattr(
+        self.ffmpeg_path: str = getattr(
             settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg')
         )
-        self.ffprobe_path = getattr(
+        self.ffprobe_path: str = getattr(
             settings, 'VIDEO_ENCODING_FFPROBE_PATH', which('ffprobe')
         )
 
@@ -51,7 +48,7 @@ class FFmpegBackend(BaseEncodingBackend):
             )
 
     @classmethod
-    def check(cls):
+    def check(cls) -> List[checks.Error]:
         errors = super(FFmpegBackend, cls).check()
         try:
             FFmpegBackend()
@@ -66,90 +63,65 @@ class FFmpegBackend(BaseEncodingBackend):
             )
         return errors
 
-    def _spawn(self, cmds):
+    def _spawn(self, cmd: List[str]) -> subprocess.Popen:
         try:
-            return Popen(
-                cmds,
+            return subprocess.Popen(
+                cmd,
                 shell=False,
-                stdin=PIPE,
-                stdout=PIPE,
-                stderr=PIPE,
-                close_fds=True,
+                stderr=subprocess.PIPE,  # ffmpeg reports live stats to stderr
+                universal_newlines=False,  # stderr will return bytes
             )
         except OSError as e:
             raise exceptions.FFmpegError('Error while running ffmpeg binary') from e
 
-    def _check_returncode(self, process):
-        stdout, stderr = process.communicate()
-        if process.returncode != 0:
-            raise exceptions.FFmpegError(
-                "`{}` exited with code {:d}".format(
-                    ' '.join(process.args), process.returncode
-                )
-            )
-        self.stdout = stdout.decode(console_encoding)
-        self.stderr = stderr.decode(console_encoding)
-        return self.stdout, self.stderr
-
-    # TODO reduce complexity
-    def encode(self, source_path, target_path, params):  # NOQA: C901
+    def encode(
+        self, source_path: str, target_path: str, params: List[str]
+    ) -> Generator[float, None, None]:
         """
-        Encodes a video to a specified file. All encoder specific options
-        are passed in using `params`.
+        Encodes a video to a specified file.
+
+        All encoder specific options are passed in using `params`.
         """
         total_time = self.get_media_info(source_path)['duration']
 
-        cmds = [self.ffmpeg_path, '-i', source_path]
-        cmds.extend(self.params)
-        cmds.extend(params)
-        cmds.extend([target_path])
+        cmd = [self.ffmpeg_path, '-i', source_path, *self.params, *params, target_path]
+        process = self._spawn(cmd)
+        # ffmpeg write the progress to stderr
+        # each line is either terminated by \n or \r
+        reader = io.TextIOWrapper(process.stderr, newline=None)  # type: ignore
 
-        process = self._spawn(cmds)
-
-        buf = output = ''
         # update progress
-        while True:
-            # any more data?
-            out = process.stderr.read(10)
-            if not out:
-                break
-
-            out = out.decode(console_encoding)
-            output += out
-            buf += out
+        while process.poll() is None:  # is process terminated yet?
+            line = reader.readline()
 
             try:
-                line, buf = buf.split('\r', 1)
-            except ValueError:
-                continue
-
-            try:
+                # format 00:00:00.00
                 time_str = RE_TIMECODE.findall(line)[0]
             except IndexError:
                 continue
 
-            # convert progress to percent
-            time = 0
+            # convert time to seconds
+            time: float = 0
             for part in time_str.split(':'):
                 time = 60 * time + float(part)
 
-            percent = time / total_time
+            percent = round(time / total_time, 2)
             logger.debug('yield {}%'.format(percent))
             yield percent
 
         if os.path.getsize(target_path) == 0:
             raise exceptions.FFmpegError("File size of generated file is 0")
 
-        # wait for process to exit
-        self._check_returncode(process)
-
-        logger.debug(output)
-        if not output:
-            raise exceptions.FFmpegError("No output from FFmpeg.")
+        if process.returncode != 0:
+            raise exceptions.FFmpegError(
+                "`{}` exited with code {:d}".format(
+                    ' '.join(map(str, process.args)), process.returncode
+                )
+            )
 
         yield 100
 
-    def _parse_media_info(self, data):
+    def _parse_media_info(self, data: bytes) -> Dict:
         media_info = json.loads(data)
         media_info['video'] = [
             stream
@@ -169,17 +141,15 @@ class FFmpegBackend(BaseEncodingBackend):
         del media_info['streams']
         return media_info
 
-    def get_media_info(self, video_path):
+    def get_media_info(self, video_path: str) -> Dict[str, Union[int, float]]:
         """
         Returns information about the given video as dict.
         """
-        cmds = [self.ffprobe_path, '-i', video_path]
-        cmds.extend(['-print_format', 'json'])
-        cmds.extend(['-show_format', '-show_streams'])
+        cmd = [self.ffprobe_path, '-i', video_path]
+        cmd.extend(['-print_format', 'json'])
+        cmd.extend(['-show_format', '-show_streams'])
 
-        process = self._spawn(cmds)
-        stdout, __ = self._check_returncode(process)
-
+        stdout = subprocess.check_output(cmd)
         media_info = self._parse_media_info(stdout)
 
         return {
@@ -188,7 +158,7 @@ class FFmpegBackend(BaseEncodingBackend):
             'height': int(media_info['video'][0]['height']),
         }
 
-    def get_thumbnail(self, video_path, at_time=0.5):
+    def get_thumbnail(self, video_path: str, at_time: float = 0.5) -> str:
         """
         Extracts an image of a video and returns its path.
 
@@ -204,11 +174,10 @@ class FFmpegBackend(BaseEncodingBackend):
             raise exceptions.InvalidTimeError()
         thumbnail_time = at_time
 
-        cmds = [self.ffmpeg_path, '-i', video_path, '-vframes', '1']
-        cmds.extend(['-ss', str(thumbnail_time), '-y', image_path])
+        cmd = [self.ffmpeg_path, '-i', video_path, '-vframes', '1']
+        cmd.extend(['-ss', str(thumbnail_time), '-y', image_path])
 
-        process = self._spawn(cmds)
-        self._check_returncode(process)
+        subprocess.check_call(cmd)
 
         if not os.path.getsize(image_path):
             # we somehow failed to generate thumbnail
