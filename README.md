@@ -105,6 +105,75 @@ for format in video.format_set.complete().all():
 [django-rq]: https://github.com/ui/django-rq
 [celery]: http://www.celeryproject.org/
 
+### Generate a video thumbnail
+
+The backend provides a `get_thumbnail()` method to extract a thumbnail from a video.
+Here is a basic example on how to generate the thumbnail and store it in the model.
+
+```python
+# models.py
+from django.db import models
+
+class Video(models.Model):
+   width = models.PositiveIntegerField(editable=False, null=True)
+   height = models.PositiveIntegerField(editable=False, null=True)
+   duration = models.FloatField(editable=False, null=True)
+
+   thumbnail = ImageField(blank=True)
+   file = VideoField(width_field='width', height_field='height',
+                     duration_field='duration')
+
+   format_set = GenericRelation(Format)
+
+
+# tasks.py
+from django.core.files import File
+from video_encoding.backends import get_backend
+
+from .models import Video
+
+
+def create_thumbnail(video_pk):
+   video = Video.objects.get(pk=video_pk)
+   if not video.file:
+      # no video file attached
+      return
+
+   if video.thumbnail:
+      # thumbnail has already been generated
+      return
+
+   encoding_backend = get_backend()
+   thumbnail_path = encoding_backend.get_thumbnail(video.file.path)
+   filename = os.path.basename(self.url),
+
+   try:
+      with open(thumbnail_path, 'rb') as file_handler:
+         django_file = File(file_handler)
+         video.thumbnail.save(filename, django_file)
+      video.save()
+   finally:
+      os.unlink(thumbnail_path)
+```
+
+You should run this method in a separate process by using `django-rq`, `celery`
+or similar) and enqueue execution from within a `post_save` signal.
+
+```python
+# signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django_rq import enqueue
+
+from . import tasks
+from .models import Video
+
+
+@receiver(post_save, sender=Video)
+def create_thumbnail(sender, instance, **kwargs):
+    enqueue(tasks.create_thumbnail, instance.pk)
+```
+
 ## Configuration
 
 **VIDEO_ENCODING_THREADS** (default: `1`)  
