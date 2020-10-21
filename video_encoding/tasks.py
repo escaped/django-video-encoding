@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
 
 from video_encoding.utils import get_fieldfile_local_path
+
 from .backends import get_backend
 from .config import settings
 from .exceptions import VideoEncodingError
