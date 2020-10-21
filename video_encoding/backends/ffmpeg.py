@@ -15,6 +15,8 @@ from ..config import settings
 from .base import BaseEncodingBackend
 
 logger = logging.getLogger(__name__)
+
+# regex to extract the progress (time) from ffmpeg
 RE_TIMECODE = re.compile(r'time=(\d+:\d+:\d+.\d+) ')
 
 
@@ -78,7 +80,7 @@ class FFmpegBackend(BaseEncodingBackend):
         self, source_path: str, target_path: str, params: List[str]
     ) -> Generator[float, None, None]:
         """
-        Encodes a video to a specified file.
+        Encode a video.
 
         All encoder specific options are passed in using `params`.
         """
@@ -143,7 +145,7 @@ class FFmpegBackend(BaseEncodingBackend):
 
     def get_media_info(self, video_path: str) -> Dict[str, Union[int, float]]:
         """
-        Returns information about the given video as dict.
+        Return information about the given video.
         """
         cmd = [self.ffprobe_path, '-i', video_path]
         cmd.extend(['-print_format', 'json'])
@@ -160,7 +162,7 @@ class FFmpegBackend(BaseEncodingBackend):
 
     def get_thumbnail(self, video_path: str, at_time: float = 0.5) -> str:
         """
-        Extracts an image of a video and returns its path.
+        Extract an image from a video and return its path.
 
         If the requested thumbnail is not within the duration of the video
         an `InvalidTimeError` is thrown.

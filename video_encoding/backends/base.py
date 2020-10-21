@@ -17,8 +17,9 @@ class BaseEncodingBackend(metaclass=abc.ABCMeta):
         self, source_path: str, target_path: str, params: List[str]
     ) -> Generator[float, None, None]:  # pragma: no cover
         """
-        Encodes a video to a specified file. All encoder specific options
-        are passed in using `params`.
+        Encode a video.
+
+        All encoder specific options are passed in using `params`.
         """
         pass
 
@@ -27,7 +28,7 @@ class BaseEncodingBackend(metaclass=abc.ABCMeta):
         self, video_path: str
     ) -> Dict[str, Union[int, float]]:  # pragma: no cover
         """
-        Returns duration, width and height of the video as dict.
+        Return duration, width and height of the video.
         """
         pass
 
@@ -36,7 +37,7 @@ class BaseEncodingBackend(metaclass=abc.ABCMeta):
         self, video_path: str, at_time: float = 0.5
     ) -> str:  # pragma: no cover
         """
-        Extracts an image of a video and returns its path.
+        Extract an image from a video and return its path.
 
         If the requested thumbnail is not within the duration of the video
         an `InvalidTimeError` is thrown.
