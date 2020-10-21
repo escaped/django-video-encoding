@@ -19,7 +19,7 @@ def test_encode(ffmpeg, video_path):
     encoding = ffmpeg.encode(
         video_path,
         target_path,
-        ['-vf', 'scale=-2:320', '-r', '20', '-codec:v', 'libx264'],
+        ['-vf', 'scale=-2:320', '-r', '90', '-codec:v', 'libx264'],
     )
     percent = next(encoding)
     assert 0 <= percent <= 100
@@ -33,7 +33,7 @@ def test_encode(ffmpeg, video_path):
     assert percent == 100
     assert os.path.isfile(target_path)
     media_info = ffmpeg.get_media_info(target_path)
-    assert media_info == {'width': 568, 'height': 320, 'duration': 2.1}
+    assert media_info == {'width': 568, 'height': 320, 'duration': 2.027}
 
 
 def test_get_thumbnail(ffmpeg, video_path):

@@ -158,11 +158,11 @@ locate it.
 
 ### Custom Backend
 
-You can implement a custom encoding backend. Create a new class which inherits
-from `video_encoding.backends.base.BaseEncodingBackend`. You must set the
-property `name` and implement the methods `encode`, `get_media_info` and
-`get_thumbnail`. For further details see the reference implementation:
-`video_encoding.backends.ffmpeg.FFmpegBackend`.
+You can implement a custom encoding backend. Create a new class which inherits from
+[`video_encoding.backends.base.BaseEncodingBackend`](video_encoding/backends/base.py).
+You must set the property `name` and implement the methods `encode`, `get_media_info`
+and `get_thumbnail`. For further details see the reference implementation:
+[`video_encoding.backends.ffmpeg.FFmpegBackend`](video_encoding/backends/ffmpeg.py).
 
 If you want to open source your backend, follow these steps.
 
@@ -210,4 +210,3 @@ cruft update
 ```
 
 in the root of this repository.
-
