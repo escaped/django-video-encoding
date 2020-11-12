@@ -29,33 +29,80 @@ def ffmpeg():
 
 
 @pytest.fixture
-def local_video(video_path):
-    video = Video()
+def local_video(video_path) -> Generator[Video, None, None]:
+    """
+    Return a video object which is stored locally.
+    """
+    video = Video.objects.create()
     video.file.save('test.MTS', File(open(video_path, 'rb')), save=True)
-    video.save()
-    video.refresh_from_db()
-    return video
+    try:
+        yield video
+    finally:
+        try:
+            video.file.delete()
+        except ValueError:
+            # file has already been deleted
+            pass
+
+        for format in video.format_set.all():
+            format.file.delete()
+
+        video.delete()
 
 
 @pytest.fixture
-def remote_video(mocker, local_video):
-    video = Video.objects.get(pk=local_video.pk)
-    video_path = Path(video.file.path)
+def remote_video(local_video) -> Generator[Video, None, None]:
+    """
+    Return a video which is stored "remotely".
+    """
+    storage_path = Path(local_video.file.path).parent
 
-    def path(name: str) -> Path:
-        return video_path.parent / name
+    remote_video = local_video
+    remote_video.file.storage = FakeRemoteStorage(storage_path)
+    yield remote_video
 
-    def remote_exists(name: str) -> bool:
-        return path(name).exists()
 
-    def remote_open(name: str, mode: str) -> IO[Any]:
-        return open(video_path, mode)
+@pytest.fixture(params=StorageType)
+def video(
+    request, local_video: Video, remote_video: Video
+) -> Generator[Video, None, None]:
+    """
+    Return a locally and a remotely stored video.
+    """
+    storage_type = request.param
 
-    def remote_path(*args, **kwargs):
+    if storage_type == StorageType.LOCAL:
+        yield local_video
+    elif storage_type == StorageType.REMOTE:
+        yield remote_video
+    else:
+        raise ValueError(f"Invalid storage type {storage_type}")
+
+
+class FakeRemoteStorage(FileSystemStorage):
+    """
+    Fake remote storage which does not support accessing a file by path.
+    """
+
+    def __init__(self, root_path: Path) -> None:
+        super().__init__()
+        self.root_path = root_path
+
+    def delete(self, name: str) -> None:
+        file_path = self.__path(name)
+        file_path.unlink()
+
+    def exists(self, name: str) -> bool:
+        return self.__path(name).exists()
+
+    def open(self, name: str, mode: str) -> IO[Any]:
+        return open(self.__path(name), mode)
+
+    def path(self, *args, **kwargs):
         raise NotImplementedError("Remote storage does not implement path()")
 
-    def remote_save(name: str, content: File) -> str:
-        file_path = path(name)
+    def _save(self, name: str, content: File) -> str:
+        file_path = self.__path(name)
         folder_path = file_path.parent
 
         if not folder_path.is_dir():
@@ -69,30 +116,8 @@ def remote_video(mocker, local_video):
 
         return str(file_path)
 
-    def remote_delete(name: str) -> None:
-        file_path = path(name)
-        file_path.unlink()
-
-    storage = FileSystemStorage()
-    mocker.patch.object(storage, 'exists', remote_exists)
-    mocker.patch.object(storage, 'open', remote_open)
-    mocker.patch.object(storage, 'path', remote_path)
-    mocker.patch.object(storage, '_save', remote_save)
-    mocker.patch.object(storage, 'delete', remote_delete)
-
-    video.file.storage = storage
-    yield video
-
-
-@pytest.fixture(params=StorageType)
-def video(
-    request, local_video: Video, remote_video: Video
-) -> Generator[Video, None, None]:
-    storage_type = request.param
-
-    if storage_type == StorageType.LOCAL:
-        yield local_video
-    elif storage_type == StorageType.REMOTE:
-        yield remote_video
-    else:
-        raise ValueError(f"Invalid storage type {storage_type}")
+    def __path(self, name: str) -> Path:
+        """
+        Return path to local file.
+        """
+        return self.root_path / name
