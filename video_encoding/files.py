@@ -1,10 +1,7 @@
-import os
-
 from django.core.files import File
 
-from video_encoding.utils import get_fieldfile_local_path
-
 from .backends import get_backend
+from .utils import get_local_path
 
 
 class VideoFile(File):
@@ -44,12 +41,8 @@ class VideoFile(File):
         if not hasattr(self, '_info_cache'):
             encoding_backend = get_backend()
 
-            local_path, local_tmp_file = get_fieldfile_local_path(fieldfile=self)
-
-            info_cache = encoding_backend.get_media_info(local_path)
-
-            if local_tmp_file:
-                os.unlink(local_tmp_file.name)
+            with get_local_path(self) as local_path:
+                info_cache = encoding_backend.get_media_info(local_path)
 
             self._info_cache = info_cache
 
