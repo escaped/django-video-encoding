@@ -8,8 +8,8 @@ from ..models import Video
 
 
 @pytest.mark.django_db
-def test_info_forward(ffmpeg, video):
-    media_info = ffmpeg.get_media_info(video.file.path)
+def test_info_forward(ffmpeg, video, video_path):
+    media_info = ffmpeg.get_media_info(video_path)
 
     assert video.duration == media_info['duration']
     assert video.width == media_info['width']

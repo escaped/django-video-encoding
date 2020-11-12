@@ -97,6 +97,5 @@ def convert_video(fieldfile, force=False):
         # remove temporary file
         os.remove(target_path)
 
-        if temp_file:
-            os.unlink(temp_file.name)
-            temp_file.close()
+    if temp_file:
+        os.unlink(temp_file.name)

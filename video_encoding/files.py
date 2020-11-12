@@ -50,7 +50,6 @@ class VideoFile(File):
 
             if local_tmp_file:
                 os.unlink(local_tmp_file.name)
-                local_tmp_file.close()
 
             self._info_cache = info_cache
 
