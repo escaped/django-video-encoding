@@ -8,6 +8,9 @@ from django.core.files import File
 
 @contextlib.contextmanager
 def get_local_path(fieldfile: File) -> Generator[str, None, None]:
+    """
+    Get a local file to work with from a file retrieved from a FileField.
+    """
     if not hasattr(fieldfile, 'storage'):
         # Its a local file with no storage abstraction
         try:
