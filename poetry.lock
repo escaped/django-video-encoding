@@ -225,6 +225,14 @@ requirements_deprecated_finder = ["pipreqs", "pip-api"]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
 
 [[package]]
+name = "matchlib"
+version = "0.2.1"
+description = "A tool for partial comparison of (nested) data structures"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "mccabe"
 version = "0.6.1"
 description = "McCabe checker, plugin for flake8"
@@ -559,7 +567,7 @@ testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1, <4.0"
-content-hash = "fc489d5deb389ad48d702573f37fce0d3ea0757dd07ec31986d1ffd8a4827a2e"
+content-hash = "5f8f5a12d4a0061355fa6a739f0d3bcefee386dba1b1dfb5c01cfbea6544eadc"
 
 [metadata.files]
 appdirs = [
@@ -673,6 +681,10 @@ iniconfig = [
 isort = [
     {file = "isort-5.6.4-py3-none-any.whl", hash = "sha256:dcab1d98b469a12a1a624ead220584391648790275560e1a43e54c5dceae65e7"},
     {file = "isort-5.6.4.tar.gz", hash = "sha256:dcaeec1b5f0eca77faea2a35ab790b4f3680ff75590bfcb7145986905aab2f58"},
+]
+matchlib = [
+    {file = "matchlib-0.2.1-py3-none-any.whl", hash = "sha256:c6f1995f2778f08524ca54828a9de9ee5550cf85411c9db8913086ee496b1c90"},
+    {file = "matchlib-0.2.1.tar.gz", hash = "sha256:43a9a1eb09cc048a8cd7f8ef44520f10ab46b676e3952d28ef8c32fba3a6a640"},
 ]
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},

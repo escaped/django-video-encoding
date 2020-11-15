@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import IO, Any, Generator
 
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 
-from test_proj.media_library.models import Video
+from test_proj.media_library.models import Format, Video
 from video_encoding.backends.ffmpeg import FFmpegBackend
 
 
@@ -48,6 +49,20 @@ def local_video(video_path) -> Generator[Video, None, None]:
             format.file.delete()
 
         video.delete()
+
+
+@pytest.fixture
+def format(video_path, local_video) -> Generator[Format, None, None]:
+    format = Format.objects.create(
+        object_id=local_video.pk,
+        content_type=ContentType.objects.get_for_model(local_video),
+        field_name='file',
+        format='mp4_hd',
+        progress=100,
+    )
+    #
+    format.file.save('test.MTS', File(open(video_path, 'rb')), save=True)
+    yield format
 
 
 @pytest.fixture
