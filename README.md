@@ -174,6 +174,79 @@ def create_thumbnail(sender, instance, **kwargs):
     enqueue(tasks.create_thumbnail, instance.pk)
 ```
 
+### Signals
+
+During the encoding multiple signals are emitted to report the progress.
+You can register to the signals as described in the [Django documentation](https://docs.djangoproject.com/en/3.1/topics/signals/#connecting-to-signals-sent-by-specific-senders).
+
+This simple example demonstrates, on how to update the "video model" once the convertion is finished.
+
+```python
+# apps.py
+from django.apps import AppConfig
+
+
+class MyAppConfig(AppConfig):
+   # ...
+
+    def ready(self) -> None:
+      from . import signals  # register signals
+
+
+# signals.py
+from typing import Type
+
+from django.dispatch import receiver
+from video_encoding import signals
+
+from myapp.models import Video
+
+
+@receiver(signals.encoding_finished, sender=Video)
+def mark_as_finished(sender: Type[Video], instance: Video) -> None:
+   """
+   Mark video as "convertion has been finished".
+   """
+   video.processed = True
+   video.save(update_fields=['processed'])
+```
+
+#### `signals.encoding_started`I
+
+This is sent before the encoding starts.
+
+_Arguments_  
+`sender: Type[models.Model]`: Model which contains the `VideoField`.  
+`instance: models.Model)`: Instance of the model containing the `VideoField`.
+
+#### `signals.encoding_finished`
+
+Like `encoding_started()`, but sent after the file had been converted into all formats.
+
+_Arguments_  
+`sender: Type[models.Model]`: Model which contains the `VideoField`.  
+`instance: models.Model)`: Instance of the model containing the `VideoField`.
+
+#### `signals.format_started`
+
+This is sent before the video is converted to one of the configured formats.
+
+_Arguments_  
+`sender: Type[models.Model]`: Model which contains the `VideoField`.  
+`instance: models.Model)`: Instance of the model containing the `VideoField`.  
+`format: Format`: The format instance, which will reference the encoded video file.
+
+#### `signals.format_finished`
+
+Like `format_finished`, but sent after the video encoding process and includes whether the encoding was succesful or not.
+
+_Arguments_  
+`sender: Type[models.Model]`: Model which contains the `VideoField`.  
+`instance: models.Model)`: Instance of the model containing the `VideoField`.  
+`format: Format`: The format instance, which will reference the encoded video file.  
+`result: ConversionResult`: Instance of `video_encoding.signals.CovnertionResult` and indicates whether the convertion `FAILED`, `SUCCEEDED` or was `SKIPPED`.
+
+
 ## Configuration
 
 **VIDEO_ENCODING_THREADS** (default: `1`)  
