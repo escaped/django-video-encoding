@@ -244,7 +244,7 @@ _Arguments_
 `sender: Type[models.Model]`: Model which contains the `VideoField`.  
 `instance: models.Model)`: Instance of the model containing the `VideoField`.  
 `format: Format`: The format instance, which will reference the encoded video file.  
-`result: ConversionResult`: Instance of `video_encoding.signals.CovnertionResult` and indicates whether the convertion `FAILED`, `SUCCEEDED` or was `SKIPPED`.
+`result: ConversionResult`: Instance of `video_encoding.signals.ConversionResult` and indicates whether the convertion `FAILED`, `SUCCEEDED` or was `SKIPPED`.
 
 
 ## Configuration
