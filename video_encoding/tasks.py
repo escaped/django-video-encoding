@@ -5,6 +5,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
 
+from . import signals
 from .backends import get_backend
 from .backends.base import BaseEncodingBackend
 from .config import settings
@@ -43,9 +44,9 @@ def convert_video(fieldfile, force=False):
     field = fieldfile.field
 
     with get_local_path(fieldfile) as source_path:
-
         encoding_backend = get_backend()
 
+        signals.encoding_started.send(instance.__class__, instance=instance)
         for options in settings.VIDEO_ENCODING_FORMATS[encoding_backend.name]:
             video_format, created = Format.objects.get_or_create(
                 object_id=instance.pk,
@@ -53,17 +54,37 @@ def convert_video(fieldfile, force=False):
                 field_name=field.name,
                 format=options['name'],
             )
+            signals.format_started.send(Format, instance=instance, format=video_format)
 
             # do not reencode if not requested
             if video_format.file and not force:
+                signals.format_finished.send(
+                    Format,
+                    instance=instance,
+                    format=video_format,
+                    result=signals.ConversionResult.SKIPPED,
+                )
                 continue
 
             try:
                 _encode(source_path, video_format, encoding_backend, options)
             except VideoEncodingError:
+                signals.format_finished.send(
+                    Format,
+                    instance=instance,
+                    format=video_format,
+                    result=signals.ConversionResult.FAILED,
+                )
                 # TODO handle with more care
                 video_format.delete()
                 continue
+            signals.format_finished.send(
+                Format,
+                instance=instance,
+                format=video_format,
+                result=signals.ConversionResult.SUCCEEDED,
+            )
+        signals.encoding_finished.send(instance.__class__, instance=instance)
 
 
 def _encode(
