@@ -38,8 +38,10 @@ django = ">=2.2"
 pillow = ">=5.0"
 
 [tool.poetry.dev-dependencies]
+autoflake = "^1.4"
 black = "^20.8b1"
 flake8 = "^3.8.3"
+flake8-bugbear = "^20.11.1"
 isort = "^5.5.2"
 mypy = "^0.782"
 pre-commit = "^2.7.1"

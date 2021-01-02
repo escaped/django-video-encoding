@@ -21,7 +21,6 @@ class BaseEncodingBackend(metaclass=abc.ABCMeta):
 
         All encoder specific options are passed in using `params`.
         """
-        pass
 
     @abc.abstractmethod
     def get_media_info(
@@ -30,7 +29,6 @@ class BaseEncodingBackend(metaclass=abc.ABCMeta):
         """
         Return duration, width and height of the video.
         """
-        pass
 
     @abc.abstractmethod
     def get_thumbnail(
@@ -42,4 +40,3 @@ class BaseEncodingBackend(metaclass=abc.ABCMeta):
         If the requested thumbnail is not within the duration of the video
         an `InvalidTimeError` is thrown.
         """
-        pass
