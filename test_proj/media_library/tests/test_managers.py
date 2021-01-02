@@ -5,10 +5,10 @@ from ..models import Format
 
 
 @pytest.fixture
-def video_format(video):
+def video_format(local_video):
     return Format.objects.create(
-        object_id=video.pk,
-        content_type=ContentType.objects.get_for_model(video),
+        object_id=local_video.pk,
+        content_type=ContentType.objects.get_for_model(local_video),
         field_name='file',
         format='mp4_hd',
         progress=100,
@@ -16,9 +16,9 @@ def video_format(video):
 
 
 @pytest.mark.django_db
-def test_related_manager(video):
-    assert hasattr(video.format_set, 'complete')
-    assert hasattr(video.format_set, 'in_progress')
+def test_related_manager(local_video):
+    assert hasattr(local_video.format_set, 'complete')
+    assert hasattr(local_video.format_set, 'in_progress')
 
 
 @pytest.mark.django_db

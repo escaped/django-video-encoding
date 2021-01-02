@@ -6,10 +6,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
 
 from .backends import get_backend
+from .backends.base import BaseEncodingBackend
 from .config import settings
 from .exceptions import VideoEncodingError
 from .fields import VideoField
 from .models import Format
+from .utils import get_local_path
 
 
 def convert_all_videos(app_label, model_name, object_pk):
@@ -40,55 +42,64 @@ def convert_video(fieldfile, force=False):
     instance = fieldfile.instance
     field = fieldfile.field
 
-    filename = os.path.basename(fieldfile.path)
-    source_path = fieldfile.path
+    with get_local_path(fieldfile) as source_path:
 
-    encoding_backend = get_backend()
+        encoding_backend = get_backend()
 
-    for options in settings.VIDEO_ENCODING_FORMATS[encoding_backend.name]:
-        video_format, created = Format.objects.get_or_create(
-            object_id=instance.pk,
-            content_type=ContentType.objects.get_for_model(instance),
-            field_name=field.name,
-            format=options['name'],
-        )
-
-        # do not reencode if not requested
-        if video_format.file and not force:
-            continue
-        else:
-            # set progress to 0
-            video_format.reset_progress()
-
-        # TODO do not upscale videos
-
-        _, target_path = tempfile.mkstemp(
-            suffix='_{name}.{extension}'.format(**options)
-        )
-
-        try:
-            encoding = encoding_backend.encode(
-                source_path, target_path, options['params']
+        for options in settings.VIDEO_ENCODING_FORMATS[encoding_backend.name]:
+            video_format, created = Format.objects.get_or_create(
+                object_id=instance.pk,
+                content_type=ContentType.objects.get_for_model(instance),
+                field_name=field.name,
+                format=options['name'],
             )
-            while encoding:
-                try:
-                    progress = next(encoding)
-                except StopIteration:
-                    break
-                video_format.update_progress(progress)
-        except VideoEncodingError:
-            # TODO handle with more care
-            video_format.delete()
-            os.remove(target_path)
-            continue
+
+            # do not reencode if not requested
+            if video_format.file and not force:
+                continue
+
+            try:
+                _encode(source_path, video_format, encoding_backend, options)
+            except VideoEncodingError:
+                # TODO handle with more care
+                video_format.delete()
+                continue
+
+
+def _encode(
+    source_path: str,
+    video_format: Format,
+    encoding_backend: BaseEncodingBackend,
+    options: dict,
+) -> None:
+    """
+    Encode video and continously report encoding progress.
+    """
+    # TODO do not upscale videos
+    # TODO move logic to Format model
+
+    with tempfile.NamedTemporaryFile(
+        suffix='_{name}.{extension}'.format(**options)
+    ) as file_handler:
+        target_path = file_handler.name
+
+        # set progress to 0
+        video_format.reset_progress()
+
+        encoding = encoding_backend.encode(source_path, target_path, options['params'])
+        while encoding:
+            try:
+                progress = next(encoding)
+            except StopIteration:
+                break
+            video_format.update_progress(progress)
 
         # save encoded file
+        filename = os.path.basename(source_path)
+        # TODO remove existing file?
         video_format.file.save(
             '{filename}_{name}.{extension}'.format(filename=filename, **options),
             File(open(target_path, mode='rb')),
         )
 
         video_format.update_progress(100)  # now we are ready
-
-        # remove temporary file
-        os.remove(target_path)

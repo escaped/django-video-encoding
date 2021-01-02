@@ -1,8 +1,7 @@
-import os
-
 from django.core.files import File
 
 from .backends import get_backend
+from .utils import get_local_path
 
 
 class VideoFile(File):
@@ -41,9 +40,10 @@ class VideoFile(File):
         """
         if not hasattr(self, '_info_cache'):
             encoding_backend = get_backend()
-            try:
-                path = os.path.abspath(self.path)
-            except AttributeError:
-                path = os.path.abspath(self.name)
-            self._info_cache = encoding_backend.get_media_info(path)
+
+            with get_local_path(self) as local_path:
+                info_cache = encoding_backend.get_media_info(local_path)
+
+            self._info_cache = info_cache
+
         return self._info_cache
