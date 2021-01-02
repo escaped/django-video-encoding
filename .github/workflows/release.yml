@@ -36,6 +36,7 @@ jobs:
           draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
 
   publish:
+    needs: [release]
     name: Build and publish Python distributions to PyPI
     runs-on: ubuntu-latest
     steps:

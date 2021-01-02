@@ -7,13 +7,21 @@ repos:
         language: system
         entry: poetry run black
         types: [python]
+  
+  - repo: local
+    hooks:
+      - id: autoflake
+        name: autoflake
+        language: system
+        entry: poetry run autoflake --expand-star-imports --remove-all-unused-imports --remove-unused-variables --in-place --recursive test_proj/ video_encoding/
+        types: [python]
 
   - repo: local
     hooks:
       - id: isort
         name: isort
         language: system
-        entry: poetry run isort -profile black
+        entry: poetry run isort
         types: [python]
 
   - repo: local
