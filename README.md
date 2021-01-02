@@ -211,7 +211,7 @@ def mark_as_finished(sender: Type[Video], instance: Video) -> None:
    video.save(update_fields=['processed'])
 ```
 
-#### `signals.encoding_started`I
+#### `signals.encoding_started`
 
 This is sent before the encoding starts.
 
