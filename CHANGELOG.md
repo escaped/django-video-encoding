@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-01-03
+
 ### Added
 
 * support for django-storages, @lifenautjoe & @bashu
@@ -58,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Initial release
 
 [Unreleased]: https://github.com/escaped/django-video-encoding/compare/0.4.0...HEAD
+[1.0.0]: https://github.com/escaped/django-video-encoding/compare/0.4.0...1.0.0
 [0.4.0]: https://github.com/escaped/django-video-encoding/compare/0.3.1...0.4.0
 [0.3.1]: https://github.com/escaped/django-video-encoding/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/escaped/django-video-encoding/compare/0.3.0...0.2.0
