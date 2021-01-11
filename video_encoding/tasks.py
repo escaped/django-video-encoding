@@ -20,8 +20,8 @@ def convert_all_videos(app_label, model_name, object_pk):
     Automatically converts all videos of a given instance.
     """
     # get instance
-    Model = apps.get_model(app_label=app_label, model_name=model_name)
-    instance = Model.objects.get(pk=object_pk)
+    model_class = apps.get_model(app_label=app_label, model_name=model_name)
+    instance = model_class.objects.get(pk=object_pk)
 
     # search for `VideoFields`
     fields = instance._meta.fields

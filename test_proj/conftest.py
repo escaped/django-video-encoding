@@ -45,24 +45,23 @@ def local_video(video_path) -> Generator[Video, None, None]:
             # file has already been deleted
             pass
 
-        for format in video.format_set.all():
-            format.file.delete()
+        for format_ in video.format_set.all():
+            format_.file.delete()
 
         video.delete()
 
 
 @pytest.fixture
-def format(video_path, local_video) -> Generator[Format, None, None]:
-    format = Format.objects.create(
+def video_format(video_path, local_video) -> Generator[Format, None, None]:
+    format_ = Format.objects.create(
         object_id=local_video.pk,
         content_type=ContentType.objects.get_for_model(local_video),
         field_name='file',
         format='mp4_hd',
         progress=100,
     )
-    #
-    format.file.save('test.MTS', File(open(video_path, 'rb')), save=True)
-    yield format
+    format_.file.save('test.MTS', File(open(video_path, 'rb')), save=True)
+    yield format_
 
 
 @pytest.fixture
@@ -110,7 +109,7 @@ class FakeRemoteStorage(FileSystemStorage):
     def exists(self, name: str) -> bool:
         return self.__path(name).exists()
 
-    def open(self, name: str, mode: str) -> IO[Any]:
+    def open(self, name: str, mode: str) -> IO[Any]:  # noqa: A003
         return open(self.__path(name), mode)
 
     def path(self, *args, **kwargs):

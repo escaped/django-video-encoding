@@ -130,7 +130,7 @@ def test_signals__encoding_failed(
 
 @pytest.mark.django_db
 def test_signals__encoding_skipped(
-    monkeypatch, mocker, local_video: models.Video, format: models.Format
+    monkeypatch, mocker, local_video: models.Video, video_format: models.Format
 ) -> None:
     """
     Make sure encoding signal reports skipped, if file had been encoded before.
@@ -143,8 +143,8 @@ def test_signals__encoding_skipped(
 
     mocker.patch.object(tasks, '_encode')  # don't encode anything
     # encoding has already been done for the given format
-    format.format = encoding_format["name"]
-    format.save()
+    video_format.format = encoding_format["name"]
+    video_format.save()
 
     listener = mocker.MagicMock()
     signals.format_started.connect(listener)
