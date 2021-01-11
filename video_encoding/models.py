@@ -34,7 +34,7 @@ class Format(models.Model):
         editable=False,
         verbose_name=_("Progress"),
     )
-    format = models.CharField(
+    format = models.CharField(  # noqa: A003
         max_length=255,
         editable=False,
         verbose_name=_("Format"),
