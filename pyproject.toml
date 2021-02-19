@@ -24,6 +24,7 @@ classifiers = [
   "Programming Language :: Python :: 3.6",
   "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
@@ -33,12 +34,15 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.6.1, <4.0"
-django-appconf = "^1.0"
+
 django = ">=2.2"
+
+django-appconf = "^1.0"
 pillow = ">=5.0"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
+better-exceptions = "^0.3.2"
 black = "^20.8b1"
 flake8 = "^3.8.3"
 flake8-bugbear = "^20.11.1"
@@ -46,7 +50,8 @@ flake8-builtins = "^1.5.3"
 flake8-comprehensions = "^3.3.1"
 flake8-debugger = "^4.0.0"
 isort = "^5.5.2"
-mypy = "^0.782"
+mypy = "^0.800"
+pdbpp = "^0.10.2"
 pep8-naming = "^0.11.1"
 pre-commit = "^2.7.1"
 pytest = "^6.0.1"
