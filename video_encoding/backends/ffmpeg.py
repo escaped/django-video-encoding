@@ -148,6 +148,7 @@ class FFmpegBackend(BaseEncodingBackend):
         Return information about the given video.
         """
         cmd = [self.ffprobe_path, '-i', video_path]
+        cmd.extend(['-hide_banner',  '-loglevel', 'warning'])
         cmd.extend(['-print_format', 'json'])
         cmd.extend(['-show_format', '-show_streams'])
 
