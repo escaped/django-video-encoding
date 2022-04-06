@@ -94,12 +94,11 @@ class FFmpegBackend(BaseEncodingBackend):
 
         # update progress
         while process.poll() is None:  # is process terminated yet?
-            line = reader.readline()
-
             try:
+                line = reader.readline()
                 # format 00:00:00.00
                 time_str = RE_TIMECODE.findall(line)[0]
-            except IndexError:
+            except (UnicodeDecodeError, IndexError):
                 continue
 
             # convert time to seconds
