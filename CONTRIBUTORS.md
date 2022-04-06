@@ -5,4 +5,5 @@
 * [@goranpavlovic](https://github.com/goranpavlovic)
 * [@lifenautjoe](https://github.com/lifenautjoe)
 * [@mabuelhagag](https://github.com/mabuelhagag)
+* [@ayushin](https://github.com/apexlabs-ai)
 
