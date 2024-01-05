@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 def get_backend_class():
