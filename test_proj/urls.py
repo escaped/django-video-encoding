@@ -1,4 +1,4 @@
-from django.conf.urls import re_path
+from django.urls import re_path
 from django.contrib import admin
 
 from .media_library.views import VideoFormView
