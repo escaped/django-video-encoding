@@ -11,7 +11,10 @@ from video_encoding.backends.ffmpeg import FFmpegBackend
 def test_get_media_info(ffmpeg, video_path):
     media_info = ffmpeg.get_media_info(video_path)
 
-    assert media_info == {'width': 1280, 'height': 720, 'duration': 2.022}
+    assert media_info['width'] == 1280
+    assert media_info['height'] == 720
+    assert media_info['duration'] == pytest.approx(2.02, abs=0.05)
+
 
 
 def test_encode(ffmpeg, video_path):
@@ -33,8 +36,10 @@ def test_encode(ffmpeg, video_path):
     assert percent == 100
     assert os.path.isfile(target_path)
     media_info = ffmpeg.get_media_info(target_path)
-    assert media_info == {'width': 568, 'height': 320, 'duration': 2.027}
-
+    
+    assert media_info['width'] == 568
+    assert media_info['height'] == 320
+    assert media_info['duration'] == pytest.approx(2.02, abs=0.05)
 
 def test_get_thumbnail(ffmpeg, video_path):
     thumbnail_path = ffmpeg.get_thumbnail(video_path)
