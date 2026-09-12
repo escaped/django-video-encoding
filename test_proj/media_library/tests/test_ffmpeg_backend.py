@@ -1,3 +1,4 @@
+import io
 import os
 import tempfile
 
@@ -6,6 +7,27 @@ from PIL import Image
 
 from video_encoding import exceptions
 from video_encoding.backends.ffmpeg import FFmpegBackend
+
+
+class FakeFFmpegProcess:
+    """
+    Minimal stand-in for a running ffmpeg process replaying canned stderr.
+
+    A real process writes progress lines while it runs; ``BytesIO`` delivers
+    them all at once and ``TextIOWrapper`` may read ahead, so ``poll`` simply
+    reports the process as running for as many loop iterations as there are
+    canned lines.
+    """
+
+    def __init__(self, lines):
+        self.lines = list(lines)
+        self.stderr = io.BytesIO(b''.join(self.lines))
+        self.returncode = 0
+        self.polls = 0
+
+    def poll(self):
+        self.polls += 1
+        return None if self.polls <= len(self.lines) else 0
 
 
 def test_get_media_info(ffmpeg, video_path):
@@ -37,6 +59,23 @@ def test_encode(ffmpeg, video_path):
     assert media_info['height'] == 320
     # See `test_get_media_info` for why the duration is compared loosely.
     assert media_info['duration'] == pytest.approx(2.027, abs=0.05)
+
+
+def test_encode_progress_is_percent(ffmpeg, mocker, tmp_path):
+    process = FakeFFmpegProcess(
+        [
+            b'frame= 10 time=00:00:01.00 bitrate=0kbits/s\r',
+            b'frame= 20 time=00:00:02.00 bitrate=0kbits/s\r',
+        ]
+    )
+    mocker.patch.object(ffmpeg, '_spawn', return_value=process)
+    mocker.patch.object(ffmpeg, 'get_media_info', return_value={'duration': 4.0})
+    target_path = tmp_path / 'encoded.mp4'
+    target_path.write_bytes(b'ffmpeg output')
+
+    progress = list(ffmpeg.encode('source.mp4', str(target_path), []))
+
+    assert progress == [25.0, 50.0, 100]
 
 
 def test_get_thumbnail(ffmpeg, video_path):
