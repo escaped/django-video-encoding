@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10
+        uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
       - name: Install dependencies
@@ -51,7 +51,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
       - name: Set up uv and Python ${{ matrix.python-version }}
-        uses: astral-sh/setup-uv@v10
+        uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
@@ -67,6 +67,12 @@ jobs:
         run: |
           uv run --no-sync python -m django check --settings=test_proj.settings
           uv run --no-sync python -m django makemigrations --check --dry-run --settings=test_proj.settings
+          uv run --no-sync python -m django migrate --noinput --settings=test_proj.settings
+          uv run --no-sync python -m django runserver 127.0.0.1:8000 --noreload --settings=test_proj.settings &
+          SERVER_PID=$!
+          sleep 5
+          curl --fail --silent --show-error http://127.0.0.1:8000/ > /dev/null
+          kill "$SERVER_PID"
       - name: Test
         run: uv run --no-sync pytest
       - name: Upload coverage to Coveralls

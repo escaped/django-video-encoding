@@ -71,10 +71,14 @@ select = [
     "N",   # pep8-naming
     "T10", # flake8-debugger
     "W",   # pycodestyle warnings
+    "C90", # mccabe complexity
 ]
 ignore = [
     "E501", # code is formatted using ruff format
 ]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 9
 
 [tool.ruff.format]
 quote-style = "preserve"
@@ -106,7 +110,7 @@ exclude_lines = [
     "raise AssertionError",
     "raise NotImplementedError",
     # Don't complain if non-runnable code isn't run:
-    "if __name__ == __main__:",
+    "if __name__ == .__main__.:",
     # No need to check type checking imports
     "if TYPE_CHECKING:",
 ]

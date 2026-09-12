@@ -87,12 +87,12 @@ def test_check():
 
 def test_missing_binary_error_message(mocker):
     mocker.patch('video_encoding.backends.ffmpeg.which', return_value=None)
-    with pytest.raises(exceptions.FFmpegError, match='ffmpeg binary not found'):
+    with pytest.raises(exceptions.FFmpegError, match=r'^ffmpeg binary not found: $'):
         FFmpegBackend()
 
     mocker.patch(
         'video_encoding.backends.ffmpeg.which',
         side_effect=['/usr/bin/ffmpeg', None],
     )
-    with pytest.raises(exceptions.FFmpegError, match='ffprobe binary not found'):
+    with pytest.raises(exceptions.FFmpegError, match=r'^ffprobe binary not found: $'):
         FFmpegBackend()
