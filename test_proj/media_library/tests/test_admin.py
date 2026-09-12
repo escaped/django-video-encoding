@@ -10,4 +10,7 @@ def admin_client(client, admin_user):
 
 def test_format_inline(admin_client, video):
     url = reverse('admin:media_library_video_change', args=(video.pk,))
-    admin_client.get(url)
+
+    response = admin_client.get(url)
+
+    assert response.status_code == 200

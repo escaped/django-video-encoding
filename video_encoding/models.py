@@ -77,7 +77,7 @@ class Format(models.Model):
         return self.__str__()
 
     def update_progress(self, percent, commit=True):
-        if 0 > percent > 100:
+        if not 0 <= percent <= 100:
             raise ValueError("Invalid percent value.")
 
         self.progress = percent
@@ -85,6 +85,6 @@ class Format(models.Model):
             self.save()
 
     def reset_progress(self, commit=True):
-        self.percent = 0
+        self.progress = 0
         if commit:
             self.save()

@@ -32,22 +32,23 @@ class FFmpegBackend(BaseEncodingBackend):
             '-2',  # support aac codec (which is experimental)
         ]
 
-        self.ffmpeg_path: str = getattr(
-            settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg')
-        )
-        self.ffprobe_path: str = getattr(
+        ffmpeg_path = getattr(settings, 'VIDEO_ENCODING_FFMPEG_PATH', which('ffmpeg'))
+        ffprobe_path = getattr(
             settings, 'VIDEO_ENCODING_FFPROBE_PATH', which('ffprobe')
         )
 
-        if not self.ffmpeg_path:
+        if not ffmpeg_path:
             raise exceptions.FFmpegError(
-                "ffmpeg binary not found: {}".format(self.ffmpeg_path or '')
+                "ffmpeg binary not found: {}".format(ffmpeg_path or '')
             )
 
-        if not self.ffprobe_path:
+        if not ffprobe_path:
             raise exceptions.FFmpegError(
-                "ffprobe binary not found: {}".format(self.ffmpeg_path or '')
+                "ffprobe binary not found: {}".format(ffprobe_path or '')
             )
+
+        self.ffmpeg_path: str = ffmpeg_path
+        self.ffprobe_path: str = ffprobe_path
 
     @classmethod
     def check(cls) -> List[checks.Error]:
@@ -117,7 +118,7 @@ class FFmpegBackend(BaseEncodingBackend):
         if process.returncode != 0:
             raise exceptions.FFmpegError(
                 "`{}` exited with code {:d}".format(
-                    ' '.join(map(str, process.args)), process.returncode
+                    ' '.join(map(str, cmd)), process.returncode
                 )
             )
 
@@ -148,7 +149,7 @@ class FFmpegBackend(BaseEncodingBackend):
         Return information about the given video.
         """
         cmd = [self.ffprobe_path, '-i', video_path]
-        cmd.extend(['-hide_banner',  '-loglevel', 'warning'])
+        cmd.extend(['-hide_banner', '-loglevel', 'warning'])
         cmd.extend(['-print_format', 'json'])
         cmd.extend(['-show_format', '-show_streams'])
 
