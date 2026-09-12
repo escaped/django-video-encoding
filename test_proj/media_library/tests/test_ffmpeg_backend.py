@@ -27,12 +27,8 @@ def test_encode(ffmpeg, video_path):
     )
     percent = next(encoding)
     assert 0 <= percent <= 100
-    while percent:
+    for percent in encoding:
         assert 0 <= percent <= 100
-        try:
-            percent = next(encoding)
-        except StopIteration:
-            break
 
     assert percent == 100
     assert os.path.isfile(target_path)
