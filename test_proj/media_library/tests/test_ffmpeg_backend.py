@@ -1,5 +1,6 @@
 import io
 import os
+import subprocess
 import tempfile
 
 import pytest
@@ -94,6 +95,40 @@ def test_encode_ignores_invalid_utf8(ffmpeg, mocker, tmp_path):
     progress = list(ffmpeg.encode('source.mp4', str(target_path), []))
 
     assert progress == [25.0, 100]
+
+
+@pytest.fixture()
+def small_video_path(ffmpeg, tmp_path):
+    path = tmp_path / 'small.mp4'
+    subprocess.check_call(
+        [
+            ffmpeg.ffmpeg_path,
+            '-v',
+            'error',
+            '-f',
+            'lavfi',
+            '-i',
+            'testsrc=size=320x240:rate=10',
+            '-t',
+            '1',
+            '-pix_fmt',
+            'yuv420p',
+            str(path),
+        ]
+    )
+    return str(path)
+
+
+def test_default_formats_do_not_upscale(ffmpeg, small_video_path, settings, tmp_path):
+    source_info = ffmpeg.get_media_info(small_video_path)
+
+    for options in settings.VIDEO_ENCODING_FORMATS['FFmpeg']:
+        target_path = tmp_path / 'encoded.{}'.format(options['extension'])
+        list(ffmpeg.encode(small_video_path, str(target_path), options['params']))
+        target_info = ffmpeg.get_media_info(str(target_path))
+
+        assert target_info['width'] == source_info['width']
+        assert target_info['height'] == source_info['height']
 
 
 def test_get_thumbnail(ffmpeg, video_path):

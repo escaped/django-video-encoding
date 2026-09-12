@@ -96,7 +96,6 @@ def _encode(
     """
     Encode video and continously report encoding progress.
     """
-    # TODO do not upscale videos
     # TODO move logic to Format model
 
     with tempfile.NamedTemporaryFile(
