@@ -70,9 +70,8 @@ jobs:
           uv run --no-sync python -m django migrate --noinput --settings=test_proj.settings
           uv run --no-sync python -m django runserver 127.0.0.1:8000 --noreload --settings=test_proj.settings &
           SERVER_PID=$!
-          sleep 5
-          curl --fail --silent --show-error http://127.0.0.1:8000/ > /dev/null
-          kill "$SERVER_PID"
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          curl --fail --silent --show-error --retry 5 --retry-connrefused --retry-delay 1 http://127.0.0.1:8000/ > /dev/null
       - name: Test
         run: uv run --no-sync pytest
       - name: Upload coverage to Coveralls
