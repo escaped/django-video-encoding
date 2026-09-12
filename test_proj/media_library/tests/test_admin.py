@@ -14,3 +14,12 @@ def test_format_inline(admin_client, video):
     response = admin_client.get(url)
 
     assert response.status_code == 200
+
+
+def test_video_add_form_allows_file_upload(admin_client):
+    url = reverse('admin:media_library_video_add')
+
+    response = admin_client.get(url)
+
+    assert response.status_code == 200
+    assert 'type="file"' in response.content.decode()
