@@ -91,7 +91,8 @@ class FFmpegBackend(BaseEncodingBackend):
         process = self._spawn(cmd)
         # ffmpeg write the progress to stderr
         # each line is either terminated by \n or \r
-        reader = io.TextIOWrapper(process.stderr, newline=None)  # type: ignore
+        # ffmpeg may echo non-UTF-8 metadata (e.g. artwork) to stderr
+        reader = io.TextIOWrapper(process.stderr, newline=None, errors='replace')  # type: ignore
 
         # update progress
         while process.poll() is None:  # is process terminated yet?
