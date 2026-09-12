@@ -8,7 +8,6 @@ import video_encoding.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('video_encoding', '0001_initial'),
     ]

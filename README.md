@@ -1,7 +1,7 @@
 # django-video-encoding
 
 ![PyPI](https://img.shields.io/pypi/v/django-video-encoding?style=flat-square)
-![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/escaped/django-video-encoding/Test%20&%20Lint/master?style=flat-square)
+![GitHub Workflow Status (master)](https://img.shields.io/github/actions/workflow/status/escaped/django-video-encoding/test.yml?branch=master&style=flat-square)
 ![Coveralls github branch](https://img.shields.io/coveralls/github/escaped/django-video-encoding/master?style=flat-square)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-video-encoding?style=flat-square)
 ![PyPI - License](https://img.shields.io/pypi/l/django-video-encoding?style=flat-square)
@@ -10,8 +10,17 @@ django-video-encoding helps to convert your videos into different formats and re
 
 ## Requirements
 
-* Python 3.6.1 or newer
+* Python 3.10 or newer
+* Django 5.2 or newer (5.2 LTS, 6.0 and 6.1 are tested)
 * ffmpeg and ffprobe
+
+The following combinations are supported and covered by the test matrix:
+
+| Django  | Python            |
+|---------|-------------------|
+| 5.2 LTS | 3.10 – 3.14       |
+| 6.0     | 3.12 – 3.14       |
+| 6.1     | 3.12 – 3.14       |
 
 ## Installation
 
@@ -37,14 +46,15 @@ from video_encoding.models import Format
 
 
 class Video(models.Model):
-   width = models.PositiveIntegerField(editable=False, null=True)
-   height = models.PositiveIntegerField(editable=False, null=True)
-   duration = models.FloatField(editable=False, null=True)
+    width = models.PositiveIntegerField(editable=False, null=True)
+    height = models.PositiveIntegerField(editable=False, null=True)
+    duration = models.FloatField(editable=False, null=True)
 
-   file = VideoField(width_field='width', height_field='height',
-                     duration_field='duration')
+    file = VideoField(
+        width_field='width', height_field='height', duration_field='duration'
+    )
 
-   format_set = GenericRelation(Format)
+    format_set = GenericRelation(Format)
 ```
 
 To show all converted videos in the admin, you should add the `FormatInline`
@@ -59,11 +69,11 @@ from .models import Video
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-   inlines = (FormatInline,)
+    inlines = (FormatInline,)
 
-   list_dispaly = ('get_filename', 'width', 'height', 'duration')
-   fields = ('file', 'width', 'height', 'duration')
-   readonly_fields = fields
+    list_dispaly = ('get_filename', 'width', 'height', 'duration')
+    fields = ('file', 'width', 'height', 'duration')
+    readonly_fields = fields
 ```
 
 
@@ -88,10 +98,12 @@ from .models import Video
 
 @receiver(post_save, sender=Video)
 def convert_video(sender, instance, **kwargs):
-    enqueue(tasks.convert_all_videos,
-            instance._meta.app_label,
-            instance._meta.model_name,
-            instance.pk)
+    enqueue(
+        tasks.convert_all_videos,
+        instance._meta.app_label,
+        instance._meta.model_name,
+        instance.pk,
+    )
 ```
 
 After a while You can access the converted videos using
@@ -114,16 +126,18 @@ Here is a basic example on how to generate the thumbnail and store it in the mod
 # models.py
 from django.db import models
 
+
 class Video(models.Model):
-   width = models.PositiveIntegerField(editable=False, null=True)
-   height = models.PositiveIntegerField(editable=False, null=True)
-   duration = models.FloatField(editable=False, null=True)
+    width = models.PositiveIntegerField(editable=False, null=True)
+    height = models.PositiveIntegerField(editable=False, null=True)
+    duration = models.FloatField(editable=False, null=True)
 
-   thumbnail = ImageField(blank=True)
-   file = VideoField(width_field='width', height_field='height',
-                     duration_field='duration')
+    thumbnail = ImageField(blank=True)
+    file = VideoField(
+        width_field='width', height_field='height', duration_field='duration'
+    )
 
-   format_set = GenericRelation(Format)
+    format_set = GenericRelation(Format)
 
 
 # tasks.py
@@ -134,26 +148,26 @@ from .models import Video
 
 
 def create_thumbnail(video_pk):
-   video = Video.objects.get(pk=video_pk)
-   if not video.file:
-      # no video file attached
-      return
+    video = Video.objects.get(pk=video_pk)
+    if not video.file:
+        # no video file attached
+        return
 
-   if video.thumbnail:
-      # thumbnail has already been generated
-      return
+    if video.thumbnail:
+        # thumbnail has already been generated
+        return
 
-   encoding_backend = get_backend()
-   thumbnail_path = encoding_backend.get_thumbnail(video.file.path)
-   filename = os.path.basename(self.url),
+    encoding_backend = get_backend()
+    thumbnail_path = encoding_backend.get_thumbnail(video.file.path)
+    filename = (os.path.basename(self.url),)
 
-   try:
-      with open(thumbnail_path, 'rb') as file_handler:
-         django_file = File(file_handler)
-         video.thumbnail.save(filename, django_file)
-      video.save()
-   finally:
-      os.unlink(thumbnail_path)
+    try:
+        with open(thumbnail_path, 'rb') as file_handler:
+            django_file = File(file_handler)
+            video.thumbnail.save(filename, django_file)
+        video.save()
+    finally:
+        os.unlink(thumbnail_path)
 ```
 
 You should run this method in a separate process by using `django-rq`, `celery`
@@ -177,7 +191,7 @@ def create_thumbnail(sender, instance, **kwargs):
 ### Signals
 
 During the encoding multiple signals are emitted to report the progress.
-You can register to the signals as described in the [Django documentation](https://docs.djangoproject.com/en/3.1/topics/signals/#connecting-to-signals-sent-by-specific-senders).
+You can register to the signals as described in the [Django documentation](https://docs.djangoproject.com/en/6.1/topics/signals/#connecting-to-signals-sent-by-specific-senders).
 
 This simple example demonstrates, on how to update the "video model" once the convertion is finished.
 
@@ -187,10 +201,10 @@ from django.apps import AppConfig
 
 
 class MyAppConfig(AppConfig):
-   # ...
+    # ...
 
     def ready(self) -> None:
-      from . import signals  # register signals
+        from . import signals  # register signals
 
 
 # signals.py
@@ -204,11 +218,11 @@ from myapp.models import Video
 
 @receiver(signals.encoding_finished, sender=Video)
 def mark_as_finished(sender: Type[Video], instance: Video) -> None:
-   """
-   Mark video as "convertion has been finished".
-   """
-   video.processed = True
-   video.save(update_fields=['processed'])
+    """
+    Mark video as "convertion has been finished".
+    """
+    video.processed = True
+    video.save(update_fields=['processed'])
 ```
 
 #### `signals.encoding_started`
@@ -319,39 +333,41 @@ If you want to open source your backend, follow these steps.
 
 ## Development
 
-This project uses [poetry](https://poetry.eustace.io/) for packaging and
-managing all dependencies and [pre-commit](https://pre-commit.com/) to run
-[flake8](http://flake8.pycqa.org/), [isort](https://pycqa.github.io/isort/),
-[mypy](http://mypy-lang.org/) and [black](https://github.com/python/black).
+This project uses [uv](https://docs.astral.sh/uv/) for packaging and managing
+all dependencies, [hatchling](https://hatch.pypa.io/) as build backend,
+[ruff](https://docs.astral.sh/ruff/) for linting and formatting,
+[mypy](https://mypy-lang.org/) for type checking and
+[pytest](https://pytest.org/) for testing.
 
-Additionally, [pdbpp](https://github.com/pdbpp/pdbpp) and [better-exceptions](https://github.com/qix-/better-exceptions) are installed to provide a better debugging experience.
-To enable `better-exceptions` you have to run `export BETTER_EXCEPTIONS=1` in your current session/terminal.
+Additionally, install `ffmpeg` and `ffprobe`, because the test suite encodes
+real videos.
 
 Clone this repository and run
 
 ```bash
-poetry install
-poetry run pre-commit install
+uv sync --group dev
 ```
 
-to create a virtual enviroment containing all dependencies.
-Afterwards, You can run the test suite using
+to create a virtual environment containing all dependencies.
+Afterwards, you can run the test suite using
 
 ```bash
-poetry run pytest
+uv run pytest
+```
+
+The test project in `test_proj` can be started with
+
+```bash
+uv run python -m django runserver --settings=test_proj.settings
+```
+
+Before committing, run the same checks as CI:
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy video_encoding test_proj
 ```
 
 This repository follows the [Conventional Commits](https://www.conventionalcommits.org/)
 style.
-
-### Cookiecutter template
-
-This project was created using [cruft](https://github.com/cruft/cruft) and the
-[cookiecutter-pyproject](https://github.com/escaped/cookiecutter-pypackage) template.
-In order to update this repository to the latest template version run
-
-```sh
-cruft update
-```
-
-in the root of this repository.
