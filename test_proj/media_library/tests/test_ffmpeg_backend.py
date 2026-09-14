@@ -67,6 +67,7 @@ def test_encode_progress_is_percent(ffmpeg, mocker, tmp_path):
         [
             b'frame= 10 time=00:00:01.00 bitrate=0kbits/s\r',
             b'frame= 20 time=00:00:02.00 bitrate=0kbits/s\r',
+            b'frame= 30 time=00:00:05.00 bitrate=0kbits/s\r',
         ]
     )
     mocker.patch.object(ffmpeg, '_spawn', return_value=process)
@@ -76,7 +77,7 @@ def test_encode_progress_is_percent(ffmpeg, mocker, tmp_path):
 
     progress = list(ffmpeg.encode('source.mp4', str(target_path), []))
 
-    assert progress == [25.0, 50.0, 100]
+    assert progress == [25.0, 50.0, 100, 100]
 
 
 def test_encode_ignores_invalid_utf8(ffmpeg, mocker, tmp_path):

@@ -109,7 +109,8 @@ class FFmpegBackend(BaseEncodingBackend):
             for part in time_str.split(':'):
                 time = 60 * time + float(part)
 
-            percent = round(time / total_time * 100, 2)
+            # ffmpeg can report a time slightly beyond the container duration
+            percent = min(100, round(time / total_time * 100, 2))
             logger.debug('yield {}%'.format(percent))
             yield percent
 

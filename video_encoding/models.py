@@ -80,7 +80,7 @@ class Format(models.Model):
         if not 0 <= percent <= 100:
             raise ValueError("Invalid percent value.")
 
-        self.progress = percent
+        self.progress = int(round(percent))
         if commit:
             self.save()
 

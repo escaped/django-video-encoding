@@ -22,6 +22,14 @@ def test_update_progress(video_format):
 
 
 @pytest.mark.django_db
+def test_update_progress__stores_an_integer(video_format):
+    video_format.update_progress(33.6, commit=False)
+
+    assert video_format.progress == 34
+    assert str(video_format).endswith('(34%)')
+
+
+@pytest.mark.django_db
 def test_reset_progress(video_format):
     assert video_format.progress == 100
 
