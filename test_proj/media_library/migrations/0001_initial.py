@@ -7,7 +7,6 @@ import video_encoding.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = []  # type: ignore
 
     operations = [

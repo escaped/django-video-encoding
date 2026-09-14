@@ -11,7 +11,11 @@ from video_encoding.backends.ffmpeg import FFmpegBackend
 def test_get_media_info(ffmpeg, video_path):
     media_info = ffmpeg.get_media_info(video_path)
 
-    assert media_info == {'width': 1280, 'height': 720, 'duration': 2.022}
+    assert media_info['width'] == 1280
+    assert media_info['height'] == 720
+    # Different ffmpeg versions report the container duration with a
+    # slightly different precision, so only require a close match.
+    assert media_info['duration'] == pytest.approx(2.022, abs=0.05)
 
 
 def test_encode(ffmpeg, video_path):
@@ -23,17 +27,16 @@ def test_encode(ffmpeg, video_path):
     )
     percent = next(encoding)
     assert 0 <= percent <= 100
-    while percent:
+    for percent in encoding:
         assert 0 <= percent <= 100
-        try:
-            percent = next(encoding)
-        except StopIteration:
-            break
 
     assert percent == 100
     assert os.path.isfile(target_path)
     media_info = ffmpeg.get_media_info(target_path)
-    assert media_info == {'width': 568, 'height': 320, 'duration': 2.027}
+    assert media_info['width'] == 568
+    assert media_info['height'] == 320
+    # See `test_get_media_info` for why the duration is compared loosely.
+    assert media_info['duration'] == pytest.approx(2.027, abs=0.05)
 
 
 def test_get_thumbnail(ffmpeg, video_path):
@@ -76,3 +79,16 @@ def test_check():
     os.environ['PATH'] = ''
     assert len(FFmpegBackend.check()) == 1
     os.environ['PATH'] = path
+
+
+def test_missing_binary_error_message(mocker):
+    mocker.patch('video_encoding.backends.ffmpeg.which', return_value=None)
+    with pytest.raises(exceptions.FFmpegError, match=r'^ffmpeg binary not found: $'):
+        FFmpegBackend()
+
+    mocker.patch(
+        'video_encoding.backends.ffmpeg.which',
+        side_effect=['/usr/bin/ffmpeg', None],
+    )
+    with pytest.raises(exceptions.FFmpegError, match=r'^ffprobe binary not found: $'):
+        FFmpegBackend()

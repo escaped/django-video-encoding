@@ -1,5 +1,4 @@
 import pytest
-from matchlib import matches
 
 from video_encoding import signals, tasks
 from video_encoding.exceptions import VideoEncodingError
@@ -46,31 +45,19 @@ def test_signals(monkeypatch, mocker, local_video: models.Video) -> None:
 
     # format started
     _, kwargs = listener.call_args_list[1]
-    assert matches(
-        kwargs,
-        {
-            'signal': signals.format_started,
-            'sender': models.Format,
-            'instance': local_video,
-            'format': ...,
-        },
-    )
+    assert kwargs['signal'] == signals.format_started
+    assert kwargs['sender'] == models.Format
+    assert kwargs['instance'] == local_video
     assert isinstance(kwargs['format'], models.Format)
     assert kwargs['format'].format == encoding_format['name']
     assert kwargs['format'].progress == 0
 
     # format finished
     _, kwargs = listener.call_args_list[2]
-    assert matches(
-        kwargs,
-        {
-            'signal': signals.format_finished,
-            'sender': models.Format,
-            'instance': local_video,
-            'format': ...,
-            'result': signals.ConversionResult.SUCCEEDED,
-        },
-    )
+    assert kwargs['signal'] == signals.format_finished
+    assert kwargs['sender'] == models.Format
+    assert kwargs['instance'] == local_video
+    assert kwargs['result'] == signals.ConversionResult.SUCCEEDED
     assert isinstance(kwargs['format'], models.Format)
     assert kwargs['format'].format == encoding_format['name']
 
@@ -110,22 +97,18 @@ def test_signals__encoding_failed(
     # check arguments and make sure they are called in the right order
     # format started
     _, kwargs = listener.call_args_list[0]
-    assert matches(kwargs, {'signal': signals.format_started, ...: ...})
+    assert kwargs['signal'] == signals.format_started
 
     # format finished, but failed
     _, kwargs = listener.call_args_list[1]
-    assert matches(
-        kwargs,
-        {
-            'signal': signals.format_finished,
-            'sender': models.Format,
-            'instance': local_video,
-            'format': ...,
-            'result': signals.ConversionResult.FAILED,
-        },
-    )
+    assert kwargs['signal'] == signals.format_finished
+    assert kwargs['sender'] == models.Format
+    assert kwargs['instance'] == local_video
+    assert kwargs['result'] == signals.ConversionResult.FAILED
     assert isinstance(kwargs['format'], models.Format)
     assert kwargs['format'].format == encoding_format['name']
+    # the failed format is removed again
+    assert local_video.format_set.count() == 0
 
 
 @pytest.mark.django_db
@@ -156,19 +139,13 @@ def test_signals__encoding_skipped(
     # check arguments and make sure they are called in the right order
     # format started
     _, kwargs = listener.call_args_list[0]
-    assert matches(kwargs, {'signal': signals.format_started, ...: ...})
+    assert kwargs['signal'] == signals.format_started
 
     # format finished, but skipped
     _, kwargs = listener.call_args_list[1]
-    assert matches(
-        kwargs,
-        {
-            'signal': signals.format_finished,
-            'sender': models.Format,
-            'instance': local_video,
-            'format': ...,
-            'result': signals.ConversionResult.SKIPPED,
-        },
-    )
+    assert kwargs['signal'] == signals.format_finished
+    assert kwargs['sender'] == models.Format
+    assert kwargs['instance'] == local_video
+    assert kwargs['result'] == signals.ConversionResult.SKIPPED
     assert isinstance(kwargs['format'], models.Format)
     assert kwargs['format'].format == encoding_format['name']
