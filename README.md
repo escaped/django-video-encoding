@@ -278,6 +278,9 @@ as `dict`.
 
 **VIDEO_ENCODING_FORMATS** (for defaults see `video_encoding/config.py`)  
 This dictionary defines all required encodings and has some resonable defaults.
+The default scale filters only downscale (`min(height, ih)`), so smaller videos
+are never upscaled. To explicitly allow upscaling, override the `scale` filter
+in your own formats, e.g. `scale=-1:480`.
 If you want to customize the formats, you have to specify `name`,
 `extension` and `params` for each format. For example
 
