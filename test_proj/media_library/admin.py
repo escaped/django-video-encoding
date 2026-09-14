@@ -9,6 +9,6 @@ from .models import Video
 class VideoAdmin(admin.ModelAdmin):
     inlines = (FormatInline,)
 
-    list_dispaly = ('get_filename', 'width', 'height', 'duration')
+    list_display = ('width', 'height', 'duration')
     fields = ('file', 'width', 'height', 'duration')
-    readonly_fields = fields
+    readonly_fields = ('width', 'height', 'duration')
