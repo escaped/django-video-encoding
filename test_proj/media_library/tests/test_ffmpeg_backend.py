@@ -78,6 +78,24 @@ def test_encode_progress_is_percent(ffmpeg, mocker, tmp_path):
     assert progress == [25.0, 50.0, 100]
 
 
+def test_encode_ignores_invalid_utf8(ffmpeg, mocker, tmp_path):
+    process = FakeFFmpegProcess(
+        [
+            b'  Metadata:\n',
+            b'    com.apple.quicktime.artwork: \xff\xfe\n',
+            b'frame= 10 time=00:00:01.00 bitrate=0kbits/s\r',
+        ]
+    )
+    mocker.patch.object(ffmpeg, '_spawn', return_value=process)
+    mocker.patch.object(ffmpeg, 'get_media_info', return_value={'duration': 4.0})
+    target_path = tmp_path / 'encoded.mp4'
+    target_path.write_bytes(b'ffmpeg output')
+
+    progress = list(ffmpeg.encode('source.mp4', str(target_path), []))
+
+    assert progress == [25.0, 100]
+
+
 def test_get_thumbnail(ffmpeg, video_path):
     thumbnail_path = ffmpeg.get_thumbnail(video_path)
 
